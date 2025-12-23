@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Join Market</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <header>
+        <div class="header-content">
+            <a href="/" class="logo">Market.</a>
+            <nav class="nav-links">
+                <a href="/">← Back to Home</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="box">
+        <h1 style="color: var(--primary-color); margin-bottom: 20px;">Create Account</h1>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST">
+            <input type="text" name="username" placeholder="Username (Letters/Numbers)" required>
+            <input type="email" name="email" placeholder="Email Address" required>
+            <input type="tel" name="phone" placeholder="Mobile (e.g. 971501234567)" required>
+            <input type="password" name="password" placeholder="Password (8+ chars, 1 Uppercase)" required>
+            
+            <button type="submit" class="btn-primary" style="width: 100%;">Sign Up</button>
+        </form>
+        
+        <div style="margin-top: 20px;">
+            <a href="/login" style="font-size: 14px; color: var(--text-secondary);">Already have an account? Login</a>
+        </div>
+    </div>
+
+</body>
+</html>

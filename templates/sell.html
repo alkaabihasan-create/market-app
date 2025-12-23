@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sell Item</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <header>
+        <div class="header-content">
+            <a href="/" class="logo">Market.</a>
+            <nav class="nav-links">
+                <a href="/">Cancel</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container" style="max-width: 600px;">
+        <h1 style="text-align: center; margin-bottom: 30px;">Sell an Item</h1>
+        
+        <div style="background: white; padding: 40px; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05);">
+            <form method="POST" enctype="multipart/form-data">
+                
+                <label style="font-weight: 600; font-size: 14px; margin-bottom: 8px; display: block;">Item Name</label>
+                <input type="text" name="name" placeholder="What are you selling?" required>
+
+                <label style="font-weight: 600; font-size: 14px; margin-bottom: 8px; display: block;">Price</label>
+                <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                    <span style="font-weight: bold; padding-right: 10px; color: var(--text-secondary);">AED</span>
+                    <input type="number" name="price" placeholder="0" required style="margin-bottom: 0;">
+                </div>
+
+                <label style="font-weight: 600; font-size: 14px; margin-bottom: 8px; display: block;">Category</label>
+                <select name="category">
+                    <option value="motors">Motors</option>
+                    <option value="electronics">Electronics</option>
+                    <option value="furniture">Furniture</option>
+                    <option value="fashion">Fashion</option>
+                    <option value="sports">Sports</option>
+                </select>
+
+                <label style="font-weight: 600; font-size: 14px; margin-bottom: 8px; display: block;">Description</label>
+                <textarea name="description" rows="4" maxlength="500" placeholder="Describe the condition, specs, etc..." style="resize: none;"></textarea>
+
+                <label style="font-weight: 600; font-size: 14px; margin-bottom: 8px; display: block;">Photo</label>
+                <input type="file" name="image" accept="image/*" required>
+
+                <button type="submit" class="btn-primary" style="width: 100%; margin-top: 10px;">Post Ad Now</button>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>

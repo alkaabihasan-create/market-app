@@ -1,0 +1,98 @@
+/* static/style.css */
+
+/* --- VARIABLES: Mubadala x Apple Theme --- */
+:root {
+    --bg-color: #F5F5F7;        /* Apple Light Grey */
+    --card-bg: #FFFFFF;
+    --text-main: #1D1D1F;
+    --text-secondary: #86868B;
+    
+    /* MUBADALA INSPIRED PALETTE */
+    --primary-color: #00778B;   /* Deep Teal */
+    --primary-hover: #005A69;
+    --accent-color: #C5A065;    /* Premium Gold/Sand */
+    
+    --danger-color: #FF3B30;
+    --success-color: #34C759;
+}
+
+/* --- GLOBAL RESETS --- */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-color);
+    margin: 0; padding: 0; color: var(--text-main);
+}
+a { text-decoration: none; color: inherit; }
+
+/* --- FIX: REMOVE PRICE SPINNER/ARROWS --- */
+/* Chrome, Safari, Edge, Opera */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+/* Firefox */
+input[type=number] { -moz-appearance: textfield; }
+
+/* --- HEADER --- */
+header {
+    background-color: rgba(255, 255, 255, 0.85); /* Glass Effect */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    position: sticky; top: 0; z-index: 100;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    padding: 15px 0; margin-bottom: 40px;
+}
+.header-content {
+    max-width: 1000px; margin: 0 auto; display: flex;
+    align-items: center; justify-content: space-between; padding: 0 20px;
+}
+.logo { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; color: var(--primary-color); }
+
+.nav-links { display: flex; align-items: center; gap: 20px; }
+.nav-links a { font-size: 14px; color: var(--text-secondary); transition: color 0.2s; font-weight: 500; }
+.nav-links a:hover { color: var(--primary-color); }
+
+/* --- BUTTONS --- */
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white; padding: 12px 24px; border-radius: 980px;
+    font-size: 14px; font-weight: 600; border: none; cursor: pointer;
+    transition: all 0.2s ease;
+}
+.btn-primary:hover { background-color: var(--primary-hover); transform: translateY(-1px); }
+
+.btn-secondary {
+    background-color: white; border: 1px solid #D2D2D7;
+    color: var(--text-main); padding: 10px 20px; border-radius: 980px;
+    font-size: 14px; font-weight: 500; cursor: pointer;
+}
+.btn-secondary:hover { border-color: var(--primary-color); color: var(--primary-color); }
+
+.btn-danger {
+    background-color: #FFF2F2; color: var(--danger-color);
+    padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600;
+}
+.btn-danger:hover { background-color: #FFD6D6; }
+
+/* --- FORMS --- */
+input, select, textarea {
+    width: 100%; padding: 14px; border-radius: 12px;
+    border: 1px solid #D2D2D7; background-color: white;
+    font-size: 15px; box-sizing: border-box; margin-bottom: 15px;
+    font-family: inherit; transition: border 0.2s;
+}
+input:focus, textarea:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(0, 119, 139, 0.1); }
+
+/* --- CONTAINERS & CARDS --- */
+.container { max-width: 1000px; margin: 0 auto; padding: 0 20px 60px; }
+
+.box { 
+    background: white; padding: 40px; border-radius: 24px; 
+    max-width: 400px; margin: 40px auto; text-align: center;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.02);
+}
+
+.alert { padding: 12px; border-radius: 10px; margin-bottom: 15px; font-size: 14px; font-weight: 500; }
+.alert-error { background: #FFF2F2; color: var(--danger-color); }
+.alert-success { background: #E3FCEF; color: var(--success-color); }

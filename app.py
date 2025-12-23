@@ -1,0 +1,250 @@
+import os
+import re  # <--- THIS WAS MISSING
+import secrets # Used for the forgot password token
+from datetime import datetime, timedelta
+from flask import Flask, render_template, request, redirect, url_for, flash
+from werkzeug.utils import secure_filename
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
+from flask_bcrypt import Bcrypt
+
+def is_strong_password(password):
+    # Rule: 8 chars, 1 uppercase, 1 lowercase, 1 number
+    if len(password) < 8: return False
+    if not re.search(r"[A-Z]", password): return False
+    if not re.search(r"[a-z]", password): return False
+    if not re.search(r"[0-9]", password): return False
+    return True
+
+app = Flask(__name__)
+
+# --- CONFIGURATION ---
+UPLOAD_FOLDER = 'static/uploads'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['SECRET_KEY'] = 'thisisasecretkey' # Needed for secure login sessions
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///market.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+db = SQLAlchemy(app)
+bcrypt = Bcrypt(app)
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login' # Go here if user tries to do something allowed only for members
+
+# --- DATABASE MODELS ---
+
+# 1. The User Table
+class User(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(20), nullable=False, unique=True)
+    email = db.Column(db.String(120), nullable=False, unique=True)
+    
+    # --- NEW: Phone Number ---
+    phone = db.Column(db.String(20), nullable=False) 
+    
+    password = db.Column(db.String(80), nullable=False)
+    reset_token = db.Column(db.String(100), nullable=True)
+    token_expiry = db.Column(db.DateTime, nullable=True)
+    items = db.relationship('Item', backref='owner', lazy=True)
+
+# 2. The Item Table (Updated to link to a User)
+class Item(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    price = db.Column(db.String(50), nullable=False)
+    category = db.Column(db.String(50), nullable=False)
+    description = db.Column(db.Text, nullable=False)
+    image = db.Column(db.String(200), nullable=False)
+    # Link to the User table
+    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+# This helps Flask find the user by ID
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+# --- ROUTES ---
+
+@app.route('/')
+def home():
+    query = request.args.get('q')
+    all_items = Item.query.all()
+
+    if not query:
+        return render_template('home.html', items=all_items)
+
+    # Search Logic
+    search_terms = query.lower().split()
+    scored_results = []
+    for item in all_items:
+        score = 0
+        if any(term in item.name.lower() for term in search_terms): score += 10
+        if any(term in item.description.lower() for term in search_terms): score += 5
+        if score > 0: scored_results.append((score, item))
+    
+    scored_results.sort(key=lambda x: x[0], reverse=True)
+    return render_template('home.html', items=[r[1] for r in scored_results])
+
+@app.route('/item/<int:id>')
+def item_detail(id):
+    item = Item.query.get_or_404(id)
+    return render_template('detail.html', item=item)
+
+@app.route('/sell', methods=['GET', 'POST'])
+@login_required # <--- NEW: Only logged in users can see this page!
+def sell_item():
+    if request.method == 'POST':
+        name = request.form['name']
+        price = request.form['price']
+        category = request.form.get('category')
+        description = request.form['description']
+        
+        image_url = "https://via.placeholder.com/300"
+        if 'image' in request.files:
+            file = request.files['image']
+            if file.filename != '':
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                image_url = f"/static/uploads/{filename}"
+
+        # Assign the 'owner' to the current logged-in user
+        new_item = Item(name=name, price=price, category=category, description=description, image=image_url, owner=current_user)
+        db.session.add(new_item)
+        db.session.commit()
+        return redirect(url_for('home'))
+
+    return render_template('sell.html')
+
+# --- AUTHENTICATION ROUTES ---
+
+# --- AUTH ROUTES ---
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form['username']
+        email = request.form['email']
+        phone = request.form['phone'] # <--- NEW: Get phone from form
+        password = request.form['password']
+        
+        # ... (Keep your existing checks for email/username existence here) ...
+
+        # Create User with Phone
+        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+        
+        # Add phone to the new user
+        new_user = User(username=username, email=email, phone=phone, password=hashed_password)
+        
+        db.session.add(new_user)
+        db.session.commit()
+        
+        flash('Account created! Please login.', 'success')
+        return redirect(url_for('login'))
+        
+    return render_template('register.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        
+        user = User.query.filter_by(email=email).first()
+        
+        if user and bcrypt.check_password_hash(user.password, password):
+            login_user(user)
+            return redirect(url_for('home'))
+        else:
+            flash('Login Failed. Check your email and password.', 'error')
+            
+    return render_template('login.html')
+# --- FORGOT PASSWORD FLOW ---
+
+import secrets # To generate random tokens
+
+@app.route('/forgot_password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        email = request.form['email']
+        user = User.query.filter_by(email=email).first()
+        
+        if user:
+            # Generate a secure token
+            token = secrets.token_hex(16)
+            user.reset_token = token
+            user.token_expiry = datetime.now() + timedelta(hours=1) # Valid for 1 hour
+            db.session.commit()
+            
+            # IN REAL LIFE: You would send an email here.
+            # FOR LOCAL DEV: We will print the link to the VS Code Terminal.
+            reset_link = url_for('reset_password', token=token, _external=True)
+            print(f"\n --- SIMULATED EMAIL --- \n Reset Link: {reset_link} \n -----------------------\n")
+            
+            flash('Reset link sent! Check your email (or terminal).', 'success')
+            return redirect(url_for('login'))
+        else:
+            flash('Email not found.', 'error')
+
+    return render_template('forgot_password.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('home'))
+@app.route('/reset_password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    user = User.query.filter_by(reset_token=token).first()
+    
+    # Check if token exists and is not expired
+    if not user or user.token_expiry < datetime.now():
+        flash('Invalid or expired token.', 'error')
+        return redirect(url_for('forgot_password'))
+        
+    if request.method == 'POST':
+        new_password = request.form['password']
+        
+        if not is_strong_password(new_password):
+            flash('Password too weak! Needs 8+ chars, uppercase, lowercase, & number.', 'error')
+            return redirect(request.url) # Reload same page
+            
+        # Update Password & Clear Token
+        user.password = bcrypt.generate_password_hash(new_password).decode('utf-8')
+        user.reset_token = None
+        user.token_expiry = None
+        db.session.commit()
+        
+        flash('Password reset! You can now login.', 'success')
+        return redirect(url_for('login'))
+        
+    return render_template('reset_password.html')
+
+# Create DB if not exists
+with app.app_context():
+    db.create_all()
+# --- DASHBOARD & DELETE ROUTES ---
+
+@app.route('/dashboard')
+@login_required
+def dashboard():
+    # Get items owned by current user
+    user_items = Item.query.filter_by(owner_id=current_user.id).all()
+    return render_template('dashboard.html', items=user_items)
+
+@app.route('/delete/<int:id>')
+@login_required
+def delete_item(id):
+    item = Item.query.get_or_404(id)
+    if item.owner_id != current_user.id:
+        flash('Permission denied.', 'error')
+        return redirect(url_for('home'))
+    
+    db.session.delete(item)
+    db.session.commit()
+    flash('Item deleted.', 'success')
+    return redirect(url_for('dashboard'))
+
+if __name__ == '__main__':
+    app.run(debug=True)

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Ads</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #F5F5F7; padding: 40px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        
+        /* Header Section */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        h1 { margin: 0; color: #1D1D1F; font-size: 28px; }
+        .btn-home { 
+            color: #008C95; 
+            text-decoration: none; 
+            font-weight: 600; 
+            padding: 8px 16px;
+            background: rgba(0, 140, 149, 0.1);
+            border-radius: 99px;
+            transition: background 0.2s;
+        }
+        .btn-home:hover { background: rgba(0, 140, 149, 0.2); }
+
+        /* The Item Row */
+        .item-row { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 18px; 
+            margin-bottom: 15px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            border: 1px solid rgba(0,0,0,0.02);
+            transition: transform 0.2s;
+        }
+        .item-row:hover { transform: translateY(-2px); }
+        
+        .item-info { display: flex; align-items: center; gap: 20px; }
+        .item-img { width: 60px; height: 60px; border-radius: 12px; object-fit: cover; background: #eee; }
+        .item-name { font-weight: 600; font-size: 16px; color: #1D1D1F; margin-bottom: 4px; }
+        .item-price { color: #86868B; font-size: 14px; }
+
+        /* Delete Button */
+        .btn-delete {
+            background: #FFF2F2;
+            color: #FF3B30; /* Apple Red */
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .btn-delete:hover { background: #FFD6D6; }
+        
+        /* Empty State */
+        .empty-state { text-align: center; color: #86868B; margin-top: 60px; }
+        .btn-post-first {
+            display: inline-block;
+            margin-top: 15px;
+            background: #008C95;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 99px;
+            text-decoration: none;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>My Ads</h1>
+            <a href="/" class="btn-home">← Home</a>
+        </div>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div style="padding: 12px; margin-bottom: 20px; border-radius: 10px; background: #E3FCEF; color: #00B894; font-weight: 500; font-size: 14px;">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% for item in items %}
+        <div class="item-row">
+            <div class="item-info">
+                <img src="{{ item.image }}" class="item-img">
+                <div>
+                    <div class="item-name">{{ item.name }}</div>
+                    <div class="item-price">AED {{ item.price }}</div>
+                </div>
+            </div>
+            
+            <a href="/delete/{{ item.id }}" class="btn-delete" onclick="return confirm('Are you sure you want to delete this ad?')">Delete</a>
+        </div>
+        {% else %}
+            <div class="empty-state">
+                <p style="font-size: 18px;">You haven't posted any items yet.</p>
+                <a href="/sell" class="btn-post-first">Post your first ad</a>
+            </div>
+        {% endfor %}
+    </div>
+
+</body>
+</html>
