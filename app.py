@@ -22,7 +22,17 @@ app = Flask(__name__)
 UPLOAD_FOLDER = 'static/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['SECRET_KEY'] = 'thisisasecretkey' # Needed for secure login sessions
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///market.db'
+# --- SMART DATABASE CONNECTION ---
+
+# 1. Try to get the database URL from the Render server
+database_url = os.environ.get('DATABASE_URL')
+
+# 2. Fix for Render: They give "postgres://" but Python needs "postgresql://"
+if database_url and database_url.startswith("postgres://"):
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
+
+# 3. If on Render, use the Cloud DB. If on Laptop, use 'elanat.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = database_url or 'sqlite:///elanat.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
