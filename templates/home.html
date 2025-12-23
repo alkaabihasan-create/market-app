@@ -80,6 +80,28 @@
             });
         }
     </script>
+<nav class="mobile-nav">
+        <a href="/">
+            <span class="icon">🏠</span>
+            <span>Home</span>
+        </a>
+        
+        <a href="/sell">
+            <span class="icon" style="background: var(--primary-color); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: -5px;">＋</span>
+            <span style="margin-top: 5px;">Sell</span>
+        </a>
 
+        {% if current_user.is_authenticated %}
+            <a href="/dashboard">
+                <span class="icon">👤</span>
+                <span>My Ads</span>
+            </a>
+        {% else %}
+            <a href="/login">
+                <span class="icon">🔑</span>
+                <span>Login</span>
+            </a>
+        {% endif %}
+    </nav>
 </body>
 </html>

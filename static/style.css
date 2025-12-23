@@ -1,98 +1,141 @@
 /* static/style.css */
 
-/* --- VARIABLES: Mubadala x Apple Theme --- */
+/* --- VARIABLES --- */
 :root {
-    --bg-color: #F5F5F7;        /* Apple Light Grey */
+    --bg-color: #F5F5F7;
     --card-bg: #FFFFFF;
     --text-main: #1D1D1F;
     --text-secondary: #86868B;
-    
-    /* MUBADALA INSPIRED PALETTE */
-    --primary-color: #00778B;   /* Deep Teal */
+    --primary-color: #00778B;   /* Mubadala Teal */
     --primary-hover: #005A69;
-    --accent-color: #C5A065;    /* Premium Gold/Sand */
-    
+    --accent-color: #C5A065;    /* Gold/Sand */
     --danger-color: #FF3B30;
     --success-color: #34C759;
 }
 
-/* --- GLOBAL RESETS --- */
+/* --- GLOBAL --- */
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     background-color: var(--bg-color);
     margin: 0; padding: 0; color: var(--text-main);
+    /* Add padding to bottom so content isn't hidden behind mobile nav */
+    padding-bottom: 80px; 
 }
 a { text-decoration: none; color: inherit; }
 
-/* --- FIX: REMOVE PRICE SPINNER/ARROWS --- */
-/* Chrome, Safari, Edge, Opera */
+/* Remove Input Spinners */
 input[type=number]::-webkit-outer-spin-button,
-input[type=number]::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-/* Firefox */
+input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 input[type=number] { -moz-appearance: textfield; }
 
 /* --- HEADER --- */
 header {
-    background-color: rgba(255, 255, 255, 0.85); /* Glass Effect */
+    background-color: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     position: sticky; top: 0; z-index: 100;
     border-bottom: 1px solid rgba(0,0,0,0.05);
-    padding: 15px 0; margin-bottom: 40px;
+    padding: 15px 0; margin-bottom: 20px;
 }
 .header-content {
     max-width: 1000px; margin: 0 auto; display: flex;
     align-items: center; justify-content: space-between; padding: 0 20px;
+    gap: 20px;
 }
-.logo { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; color: var(--primary-color); }
+.logo { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; color: var(--primary-color); white-space: nowrap; }
 
+/* Desktop Navigation */
 .nav-links { display: flex; align-items: center; gap: 20px; }
 .nav-links a { font-size: 14px; color: var(--text-secondary); transition: color 0.2s; font-weight: 500; }
 .nav-links a:hover { color: var(--primary-color); }
 
+/* --- MOBILE BOTTOM NAV (Hidden on Desktop) --- */
+.mobile-nav { display: none; } 
+
 /* --- BUTTONS --- */
 .btn-primary {
-    background-color: var(--primary-color);
-    color: white; padding: 12px 24px; border-radius: 980px;
-    font-size: 14px; font-weight: 600; border: none; cursor: pointer;
-    transition: all 0.2s ease;
+    background-color: var(--primary-color); color: white;
+    padding: 12px 24px; border-radius: 980px; font-size: 14px;
+    font-weight: 600; border: none; cursor: pointer; transition: all 0.2s;
+    display: inline-block; text-align: center;
 }
-.btn-primary:hover { background-color: var(--primary-hover); transform: translateY(-1px); }
-
 .btn-secondary {
     background-color: white; border: 1px solid #D2D2D7;
     color: var(--text-main); padding: 10px 20px; border-radius: 980px;
     font-size: 14px; font-weight: 500; cursor: pointer;
 }
-.btn-secondary:hover { border-color: var(--primary-color); color: var(--primary-color); }
-
-.btn-danger {
-    background-color: #FFF2F2; color: var(--danger-color);
-    padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600;
-}
-.btn-danger:hover { background-color: #FFD6D6; }
 
 /* --- FORMS --- */
 input, select, textarea {
     width: 100%; padding: 14px; border-radius: 12px;
     border: 1px solid #D2D2D7; background-color: white;
-    font-size: 15px; box-sizing: border-box; margin-bottom: 15px;
-    font-family: inherit; transition: border 0.2s;
+    font-size: 16px; /* 16px prevents iOS zoom on focus */
+    box-sizing: border-box; margin-bottom: 15px; font-family: inherit;
 }
-input:focus, textarea:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(0, 119, 139, 0.1); }
+input:focus { outline: none; border-color: var(--primary-color); }
 
-/* --- CONTAINERS & CARDS --- */
-.container { max-width: 1000px; margin: 0 auto; padding: 0 20px 60px; }
-
+/* --- LAYOUT --- */
+.container { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
 .box { 
-    background: white; padding: 40px; border-radius: 24px; 
-    max-width: 400px; margin: 40px auto; text-align: center;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.02);
+    background: white; padding: 30px; border-radius: 24px; 
+    max-width: 400px; margin: 20px auto; text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.04);
 }
 
-.alert { padding: 12px; border-radius: 10px; margin-bottom: 15px; font-size: 14px; font-weight: 500; }
-.alert-error { background: #FFF2F2; color: var(--danger-color); }
-.alert-success { background: #E3FCEF; color: var(--success-color); }
+/* =========================================
+   MOBILE RESPONSIVENESS (The Magic Part)
+   ========================================= */
+@media (max-width: 768px) {
+    
+    /* 1. Header Changes */
+    .header-content {
+        flex-direction: column; /* Stack Logo on top of Search */
+        align-items: stretch;   /* Full width */
+        gap: 15px;
+    }
+    
+    .logo { text-align: center; }
+    
+    .search-bar { margin: 0 !important; width: 100%; }
+    
+    /* 2. Hide Desktop Nav Links */
+    .nav-links { display: none; }
+
+    /* 3. Show Bottom Navigation Bar */
+    .mobile-nav {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+        height: 65px; /* Height of the bar */
+        background: rgba(255, 255, 255, 0.98);
+        border-top: 1px solid rgba(0,0,0,0.1);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        z-index: 1000;
+        padding-bottom: env(safe-area-inset-bottom); /* For iPhone X+ Home bar */
+    }
+
+    .mobile-nav a {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-size: 10px;
+        color: #86868B;
+        text-decoration: none;
+        gap: 4px;
+    }
+    
+    .mobile-nav a.active { color: var(--primary-color); }
+    .mobile-nav span.icon { font-size: 22px; }
+
+    /* 4. Grid Adjustments */
+    .container { padding: 0 15px; }
+    
+    /* Make cards taking up full width minus padding for better visibility */
+    .box { padding: 20px; margin: 10px auto; width: 100%; box-sizing: border-box; }
+    
+    h1 { font-size: 26px; }
+    h2 { font-size: 22px; }
+}
