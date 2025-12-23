@@ -2,44 +2,56 @@
 <html>
 <head>
     <title>Login</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
     <header>
         <div class="header-content">
             <a href="/" class="logo">Market.</a>
-            <nav class="nav-links">
-                <a href="/">← Back to Home</a>
-            </nav>
         </div>
     </header>
 
-    <div class="box">
-        <h1 style="color: var(--primary-color); margin-bottom: 20px;">Welcome Back</h1>
+    <div class="container">
+        <div class="box">
+            <h1 style="color: var(--primary-color); margin-bottom: 20px;">Welcome Back</h1>
 
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
 
-        <form method="POST">
-            <input type="email" name="email" placeholder="Email Address" required>
-            <input type="password" name="password" placeholder="Password" required>
-            <button type="submit" class="btn-primary" style="width: 100%;">Login</button>
-        </form>
-        
-        <div style="margin-top: 20px;">
-            <a href="/forgot_password" style="font-size: 14px; color: var(--primary-color);">Forgot Password?</a>
-        </div>
-        <div style="margin-top: 10px;">
-            <a href="/register" style="font-size: 14px; color: var(--text-secondary);">New here? Create Account</a>
+            <form method="POST">
+                <input type="email" name="email" placeholder="Email Address" required>
+                <input type="password" name="password" placeholder="Password" required>
+                <button type="submit" class="btn-primary" style="width: 100%;">
+                    <span class="material-symbols-rounded">login</span> Login
+                </button>
+            </form>
+            
+            <div style="margin-top: 20px;">
+                <a href="/forgot_password" style="font-size: 14px; color: var(--primary-color);">Forgot Password?</a>
+            </div>
+            <div style="margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px;">
+                <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 10px;">No account?</p>
+                <a href="/register" class="btn-secondary" style="width: 100%; box-sizing: border-box;">Create Account</a>
+            </div>
         </div>
     </div>
+
+    <nav class="mobile-nav">
+        <a href="/"><span class="material-symbols-rounded">home</span><span>Home</span></a>
+        <a href="/sell">
+             <span class="material-symbols-rounded" style="color: var(--primary-color); font-size: 32px;">add_circle</span><span>Sell</span>
+        </a>
+        <a href="/login" class="active"><span class="material-symbols-rounded">login</span><span>Login</span></a>
+    </nav>
 
 </body>
 </html>

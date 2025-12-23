@@ -126,15 +126,35 @@ def register():
     if request.method == 'POST':
         username = request.form['username']
         email = request.form['email']
-        phone = request.form['phone'] # <--- NEW: Get phone from form
+        phone = request.form['phone']
         password = request.form['password']
         
-        # ... (Keep your existing checks for email/username existence here) ...
-
-        # Create User with Phone
-        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+        # --- VALIDATION CHECKS ---
         
-        # Add phone to the new user
+        # 1. Check Username Format (Letters, Numbers, Underscore, Dot ONLY)
+        if not re.match(r'^[a-zA-Z0-9_.]+$', username):
+            flash('Username can only contain letters, numbers, underscores, and dots.', 'error')
+            return render_template('register.html')
+
+        # 2. Check Username Length
+        if len(username) < 3 or len(username) > 20:
+            flash('Username must be between 3 and 20 characters.', 'error')
+            return render_template('register.html')
+
+        # 3. Check if Username is already taken
+        user_exists = User.query.filter_by(username=username).first()
+        if user_exists:
+            flash('Username already exists. Please choose another.', 'error')
+            return render_template('register.html')
+
+        # 4. Check if Email is already taken
+        email_exists = User.query.filter_by(email=email).first()
+        if email_exists:
+            flash('Email already registered. Please login.', 'error')
+            return redirect(url_for('login'))
+
+        # --- CREATE ACCOUNT ---
+        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
         new_user = User(username=username, email=email, phone=phone, password=hashed_password)
         
         db.session.add(new_user)
