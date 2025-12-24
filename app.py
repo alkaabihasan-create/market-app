@@ -87,34 +87,7 @@ def load_user(user_id):
 
 # --- ROUTES ---
 
-# --- LIVE SEARCH API ---
-@app.route('/api/search')
-def search_api():
-    query = request.args.get('q', '')
-    
-    if not query:
-        return jsonify([])
 
-    search_term = f"%{query}%"
-    items = Item.query.filter(
-        (Item.name.ilike(search_term)) | 
-        (Item.description.ilike(search_term)) |
-        (Item.tags.ilike(search_term))  # We can now search Tags too!
-    ).all()
-
-    # Convert database objects to a JSON list
-    results = []
-    for item in items:
-        results.append({
-            'id': item.id,
-            'name': item.name,
-            'price': item.price,
-            'image': item.image,
-            'category': item.category,
-            'condition': item.condition
-        })
-    
-    return jsonify(results)
 
 @app.route('/')
 def home():
