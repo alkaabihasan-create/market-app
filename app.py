@@ -327,10 +327,6 @@ def admin():
 
 # Create DB if not exists
 with app.app_context():
-    # ⚠️ DANGER ZONE: This deletes all existing data!
-    db.drop_all()       # <--- ADD THIS LINE
-    
-    # Then it rebuilds them with the NEW columns (Condition, Tags, etc)
     db.create_all()
 
 # --- DASHBOARD & DELETE ROUTES ---
