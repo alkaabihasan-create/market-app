@@ -13,12 +13,26 @@
         <div class="header-content">
             <a href="/" class="logo">eLanat.</a>
 
-            <form action="/" class="search-bar" style="flex-grow: 1; margin: 0 40px;">
-                <div style="position: relative;">
-                    <input type="text" id="searchInput" name="q" placeholder="What are you looking for?" style="margin-bottom: 0; padding-left: 40px;">
-                    <span class="material-symbols-rounded" style="position: absolute; left: 10px; top: 12px; color: var(--text-secondary);">search</span>
-                </div>
-            </form>
+            <div class="search-bar" style="flex-grow: 1; margin: 0 40px; display: flex; gap: 10px;">
+    
+    <select id="categoryFilter" style="width: 150px; padding: 0 15px; border: none; border-right: 1px solid #ddd; background: transparent; font-size: 14px; outline: none; cursor: pointer;">
+        <option value="all">All Categories</option>
+        <option value="motors">Motors</option>
+        <option value="electronics">Electronics</option>
+        <option value="furniture">Furniture</option>
+        <option value="fashion">Fashion</option>
+        <option value="mobile">Mobiles</option>
+        <option value="jobs">Jobs</option>
+        <option value="sports">Sports</option>
+        <option value="pets">Pets</option>
+    </select>
+
+    <div style="position: relative; flex-grow: 1;">
+        <input type="text" id="searchInput" placeholder="What are you looking for?" style="margin-bottom: 0; padding-left: 35px; border: none; width: 100%;">
+        <span class="material-symbols-rounded" style="position: absolute; left: 0; top: 12px; color: var(--text-secondary);">search</span>
+    </div>
+
+</div>
 
             <nav class="nav-links">
                 {% if current_user.is_authenticated %}
@@ -88,16 +102,20 @@
         {% endif %}
     </nav>
 
-    <script>
+<script>
     const searchInput = document.getElementById('searchInput');
+    const categoryFilter = document.getElementById('categoryFilter'); // <--- NEW
     const itemGrid = document.getElementById('itemGrid');
     const noResults = document.getElementById('noResults');
 
-    // This function handles the fetching and rendering
-    async function fetchItems(query) {
+    // Master function that reads BOTH inputs
+    async function fetchItems() {
+        const query = searchInput.value.trim();
+        const category = categoryFilter.value; // <--- Get the dropdown value
+
         try {
-            // If query is empty, this URL becomes /api/search?q= (which now returns ALL items)
-            const response = await fetch(`/api/search?q=${query}`);
+            // Send both to the backend: /api/search?q=Toyota&category=motors
+            const response = await fetch(`/api/search?q=${query}&category=${category}`);
             const items = await response.json();
 
             // Clear current grid
@@ -108,7 +126,6 @@
             } else {
                 noResults.style.display = 'none';
                 
-                // Rebuild the items
                 items.forEach(item => {
                     const card = `
                     <a href="/item/${item.id}" class="box" style="margin: 0; padding: 0; overflow: hidden; text-align: left; display: block; transition: transform 0.2s;">
@@ -131,12 +148,11 @@
         }
     }
 
-    // Listen for typing
-    searchInput.addEventListener('input', function() {
-        const query = this.value.trim();
-        // Calls the function (whether query is empty or not)
-        fetchItems(query);
-    });
+    // Listener 1: When user types
+    searchInput.addEventListener('input', fetchItems);
+
+    // Listener 2: When user changes category
+    categoryFilter.addEventListener('change', fetchItems);
 </script>
 
 </body>

@@ -345,18 +345,25 @@ def dashboard():
 @app.route('/api/search')
 def search_api():
     query = request.args.get('q', '')
-    
+    category = request.args.get('category', '')  # <--- NEW: Get category
+
+    # Start with a base query (all items)
+    db_query = Item.query
+
+    # 1. Filter by Search Text (if provided)
     if query:
-        # If user typed something, search for it
         search_term = f"%{query}%"
-        items = Item.query.filter(
+        db_query = db_query.filter(
             (Item.name.ilike(search_term)) | 
             (Item.description.ilike(search_term)) |
             (Item.tags.ilike(search_term))
-        ).all()
-    else:
-        # If query is empty, return ALL items (Restore default view)
-        items = Item.query.all()
+        )
+    
+    # 2. Filter by Category (if provided and not 'all')
+    if category and category != 'all':
+        db_query = db_query.filter(Item.category == category)
+
+    items = db_query.all()
 
     # Convert to JSON
     results = []
