@@ -29,6 +29,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = database_url or 'sqlite:///elanat.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # FIX: Create the upload folder using the correct config variable
+# This prevents the "NameError" crash
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 # Initialize Extensions
