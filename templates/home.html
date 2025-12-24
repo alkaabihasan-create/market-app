@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" />
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-   <style>
+    
+    <style>
         /* DEFAULT (Desktop): Hide the bottom mobile menu */
         .mobile-nav { display: none; }
 
@@ -22,7 +23,7 @@
                 align-items: stretch !important; /* Make items full width */
             }
 
-            /* 2. Center the Logo (Optional, looks nice on mobile) */
+            /* 2. Center the Logo */
             .logo {
                 text-align: center;
                 margin-bottom: 5px;
@@ -38,13 +39,7 @@
             .search-bar { 
                 margin: 0 !important;
                 width: 100% !important;
-                max-width: none !important; /* Remove the 600px limit */
-            }
-            
-            /* 6. Compact Category Dropdown for Mobile */
-            #categoryFilter {
-                font-size: 13px !important;
-                padding-left: 5px !important;
+                max-width: none !important; 
             }
         }
     </style>
@@ -75,53 +70,19 @@
             background: #f5f5f7; 
             border-radius: 8px; 
             border: 1px solid transparent; 
-            transition: all 0.2s ease; /* Smooth transition for shadow & color */
+            transition: all 0.2s ease; 
             overflow: hidden;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05); /* Very subtle default shadow */
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         " 
         onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'; this.style.transform='translateY(-1px)'" 
         onmouseout="this.style.boxShadow='0 1px 2px rgba(0,0,0,0.05)'; this.style.transform='translateY(0)'">
             
-            <div style="
-                background: #e1e1e6; 
-                height: 100%; 
-                display: flex; 
-                align-items: center; 
-                justify-content: center; /* <--- FIX: Centers text horizontally */
-                padding: 0 5px; /* Reduced padding slightly for tightness */
-                border-right: 1px solid #d1d1d6;
-                min-width: 80px; /* Ensures the gray box has a solid feel */
-            ">
-                <select id="categoryFilter" style="
-                    width: 100%;
-                    border: none; 
-                    background: transparent; 
-                    font-size: 14px; 
-                    font-weight: 600;
-                    color: #333; 
-                    outline: none; 
-                    cursor: pointer;
-                    text-align: center; /* <--- FIX: Forces text to center */
-                    text-align-last: center; /* Helper for some browsers */
-                ">
-                    <option value="all">All</option>
-                    <option value="motors">Motors</option>
-                    <option value="electronics">Electronics</option>
-                    <option value="furniture">Furniture</option>
-                    <option value="fashion">Fashion</option>
-                    <option value="mobile">Mobiles</option>
-                    <option value="jobs">Jobs</option>
-                    <option value="sports">Sports</option>
-                    <option value="pets">Pets</option>
-                </select>
-            </div>
-
-            <input type="text" id="searchInput" placeholder="Search..." style="
+            <input type="text" id="searchInput" placeholder="Search for anything..." style="
                 flex: 1; 
                 height: 100%; 
                 border: none; 
                 background: transparent; 
-                padding-left: 15px;
+                padding-left: 20px; /* More padding since it's the first element now */
                 outline: none; 
                 font-size: 15px; 
                 color: #333;
@@ -206,10 +167,12 @@
                 </div>
             </a>
             {% endfor %} 
-        </div> <div id="noResults" style="display: none; text-align: center; margin-top: 80px; padding: 40px;">
+        </div>
+
+        <div id="noResults" style="display: none; text-align: center; margin-top: 80px; padding: 40px;">
             <span class="material-symbols-rounded" style="font-size: 64px; color: #ddd;">search_off</span>
             <h3 style="color: #666; margin-top: 15px;">No items found</h3>
-            <p style="color: #999;">Try adjusting your search or category.</p>
+            <p style="color: #999;">Try searching for something else.</p>
         </div>
     </div>
 
@@ -237,16 +200,15 @@
 
     <script>
         const searchInput = document.getElementById('searchInput');
-        const categoryFilter = document.getElementById('categoryFilter');
         const itemGrid = document.getElementById('itemGrid');
         const noResults = document.getElementById('noResults');
 
         async function fetchItems() {
             const query = searchInput.value.trim();
-            const category = categoryFilter.value;
+            // Note: We removed the category logic. The backend will default to "all" automatically.
 
             try {
-                const response = await fetch(`/api/search?q=${query}&category=${category}`);
+                const response = await fetch(`/api/search?q=${query}`);
                 const items = await response.json();
 
                 itemGrid.innerHTML = '';
@@ -285,7 +247,6 @@
         }
 
         searchInput.addEventListener('input', fetchItems);
-        categoryFilter.addEventListener('change', fetchItems);
     </script>
 
 </body>
