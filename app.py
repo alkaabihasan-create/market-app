@@ -1,6 +1,7 @@
 import os
 import re  # <--- THIS WAS MISSING
 import secrets # Used for the forgot password token
+from sqlalchemy import func
 from datetime import datetime, timedelta
 from flask import Flask, render_template, request, redirect, url_for, flash
 from werkzeug.utils import secure_filename
@@ -251,9 +252,35 @@ def reset_password(token):
         
     return render_template('reset_password.html')
 
+# --- ADMIN DASHBOARD ---
+@app.route('/admin')
+@login_required
+def admin():
+    # 1. SECURITY CHECK: Only allow YOUR email
+    admin_email = 'ALKAABIHASAN@gmail.com'  # <--- REPLACE THIS WITH YOUR EMAIL
+    
+    if current_user.email != admin_email:
+        flash("Access denied. Admin only.", "error")
+        return redirect(url_for('home'))
+
+    # 2. GATHER STATISTICS
+    total_users = User.query.count()
+    total_items = Item.query.count()
+    # Calculate sum of all prices (handle case where DB is empty)
+    total_value = db.session.query(func.sum(Item.price)).scalar() or 0
+
+    # 3. SHOW THE PAGE
+    return render_template('admin.html', 
+                         users=total_users, 
+                         items=total_items, 
+                         value=total_value)
+
+
 # Create DB if not exists
 with app.app_context():
     db.create_all()
+
+
 # --- DASHBOARD & DELETE ROUTES ---
 
 @app.route('/dashboard')
@@ -275,6 +302,8 @@ def delete_item(id):
     db.session.commit()
     flash('Item deleted.', 'success')
     return redirect(url_for('dashboard'))
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
