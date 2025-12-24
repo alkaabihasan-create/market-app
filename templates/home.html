@@ -9,187 +9,125 @@
 </head>
 <body>
 
-    <header>
-        <div class="header-content">
-            <a href="/" class="logo">eLanat.</a>
-
-           <div class="search-bar" style="
-    flex-grow: 1; 
-    margin: 0 20px; 
-    display: flex; 
-    align-items: center; 
-    background: white; 
-    border-radius: 24px; /* Pill Shape */
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Subtle Shadow */
-    border: 1px solid transparent; 
-    padding: 2px 10px;
-    max-width: 600px; /* Prevents it from getting too wide */
-    transition: box-shadow 0.2s;
-" onmouseover="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.2)'" onmouseout="this.style.boxShadow='0 2px 5px rgba(0,0,0,0.1)'">
-    
-    <select id="categoryFilter" style="
-        width: 130px; /* Fixed short width */
-        height: 40px; 
-        padding-left: 10px; 
-        border: none; 
-        background: transparent; 
-        font-size: 13px; 
-        font-weight: 500; 
-        color: #5f6368; /* Google Gray */
-        outline: none; 
-        cursor: pointer;
+    <header style="
+        background: #fff; 
+        padding: 15px 40px; 
+        display: flex; 
+        align-items: center; 
+        justify-content: space-between; 
+        border-bottom: 1px solid #f1f1f1;
+        gap: 20px; /* Ensures items don't touch */
     ">
-        <option value="all">All</option> <option value="motors">Motors</option>
-        <option value="electronics">Electronics</option>
-        <option value="furniture">Furniture</option>
-        <option value="fashion">Fashion</option>
-        <option value="mobile">Mobiles</option>
-        <option value="jobs">Jobs</option>
-        <option value="sports">Sports</option>
-        <option value="pets">Pets</option>
-    </select>
+        
+        <a href="/" class="logo" style="font-size: 24px; font-weight: 800; color: var(--primary-color); text-decoration: none; white-space: nowrap;">
+            eLanat.
+        </a>
 
-    <div style="width: 1px; height: 24px; background: #dfe1e5; margin: 0 10px;"></div>
+        <div class="search-bar" style="
+            flex: 1; /* Takes all available space */
+            max-width: 600px; /* But stops growing at 600px */
+            display: flex; 
+            align-items: center; 
+            background: #fff; 
+            border-radius: 24px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+            border: 1px solid #eee; 
+            padding: 2px 5px;
+            transition: box-shadow 0.2s;
+        " onmouseover="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.15)'" onmouseout="this.style.boxShadow='0 2px 5px rgba(0,0,0,0.1)'">
+            
+            <select id="categoryFilter" style="
+                width: auto; 
+                min-width: 100px;
+                height: 40px; 
+                padding-left: 15px; 
+                border: none; 
+                background: transparent; 
+                font-size: 14px; 
+                color: #555; 
+                outline: none; 
+                cursor: pointer;
+            ">
+                <option value="all">All</option>
+                <option value="motors">Motors</option>
+                <option value="electronics">Electronics</option>
+                <option value="furniture">Furniture</option>
+                <option value="fashion">Fashion</option>
+                <option value="mobile">Mobiles</option>
+                <option value="jobs">Jobs</option>
+                <option value="sports">Sports</option>
+                <option value="pets">Pets</option>
+            </select>
 
-    <div style="position: relative; flex-grow: 1; display: flex; align-items: center;">
-        <input type="text" id="searchInput" placeholder="Search..." style="
-            width: 100%; 
-            height: 40px; 
-            padding: 0; 
-            border: none; 
-            background: transparent; 
-            outline: none; 
-            font-size: 16px; 
-            color: #202124;
-        ">
-    </div>
+            <div style="width: 1px; height: 20px; background: #e0e0e0; margin: 0 10px;"></div>
 
-    <span class="material-symbols-rounded" style="color: var(--primary-color); font-size: 24px; padding-right: 10px; cursor: pointer;">search</span>
+            <input type="text" id="searchInput" placeholder="Search for anything..." style="
+                flex: 1; 
+                height: 40px; 
+                border: none; 
+                background: transparent; 
+                outline: none; 
+                font-size: 15px; 
+                color: #333;
+            ">
 
-</div>
-
-</div>
-
-            <nav class="nav-links">
-                {% if current_user.is_authenticated %}
-                    <a href="/dashboard">
-                        <span class="material-symbols-rounded">dashboard</span> My Ads
-                    </a>
-                    <a href="/logout" style="color: var(--danger-color);">
-                        <span class="material-symbols-rounded">logout</span>
-                    </a>
-                    <a href="/sell" class="btn-primary" style="color: white;">
-                        <span class="material-symbols-rounded">add_circle</span> Sell
-                    </a>
-                {% else %}
-                    <a href="/login">
-                         <span class="material-symbols-rounded">login</span> Login
-                    </a>
-                {% endif %}
-            </nav>
+            <div style="
+                background: var(--primary-color); 
+                width: 32px; 
+                height: 32px; 
+                border-radius: 50%; 
+                display: flex; 
+                align-items: center; 
+                justify-content: center; 
+                margin-right: 5px;
+                cursor: pointer;
+            ">
+                <span class="material-symbols-rounded" style="color: white; font-size: 20px;">search</span>
+            </div>
         </div>
+
+        <nav class="nav-links" style="display: flex; gap: 20px; align-items: center;">
+            {% if current_user.is_authenticated %}
+                <a href="/dashboard" style="text-decoration: none; color: #555; display: flex; align-items: center; gap: 5px; font-size: 14px; font-weight: 500;">
+                    <span class="material-symbols-rounded" style="font-size: 20px;">dashboard</span> My Ads
+                </a>
+                <a href="/sell" class="btn-primary" style="
+                    background: var(--primary-color); 
+                    color: white; 
+                    padding: 8px 20px; 
+                    border-radius: 20px; 
+                    text-decoration: none; 
+                    display: flex; 
+                    align-items: center; 
+                    gap: 5px;
+                    font-size: 14px;
+                ">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">add</span> Sell
+                </a>
+                <a href="/logout" style="color: #999; text-decoration: none;">
+                    <span class="material-symbols-rounded">logout</span>
+                </a>
+            {% else %}
+                <a href="/login" style="
+                    color: var(--primary-color); 
+                    text-decoration: none; 
+                    font-weight: 600; 
+                    display: flex; 
+                    align-items: center; 
+                    gap: 5px;
+                ">
+                    <span class="material-symbols-rounded">login</span> Login
+                </a>
+            {% endif %}
+        </nav>
     </header>
 
-    <div class="container">
-        <h2 style="font-size: 24px; font-weight: 600; margin-bottom: 20px; color: var(--text-main);">Fresh Recommendations</h2>
+    <div class="container" style="max-width: 1200px; margin: 30px auto; padding: 0 20px;">
         
-        <div id="itemGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+            <h2 style="font-size: 22px; font-weight: 700; color: #333;">Fresh Recommendations</h2>
+        </div>
+        
+        <div id="itemGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 25px;">
             {% for item in items %}
-            <a href="/item/{{ item.id }}" class="box" style="margin: 0; padding: 0; overflow: hidden; text-align: left; display: block; transition: transform 0.2s;">
-                <div style="height: 250px; background: #eee; position: relative;">
-                    <img src="{{ item.image }}" style="width: 100%; height: 100%; object-fit: cover;">
-                </div>
-                <div style="padding: 20px;">
-                    <h3 style="margin: 0 0 5px 0; font-size: 17px; color: var(--text-main);">{{ item.name }}</h3>
-                    <div style="font-size: 16px; font-weight: 700; color: var(--primary-color); margin-top: 10px;">
-                        AED {{ item.price }}
-                    </div>
-                </div>
-            </a>
-            {% endfor %}
-        </div>
-
-        <div id="noResults" style="display: none; text-align: center; margin-top: 50px; padding: 40px;">
-            <span class="material-symbols-rounded" style="font-size: 64px; color: #ccc;">search_off</span>
-            <h3 style="color: var(--text-secondary); margin-top: 10px;">No items found</h3>
-            <p style="color: #888;">Try searching for a different keyword.</p>
-        </div>
-    </div>
-
-    <nav class="mobile-nav">
-        <a href="/" class="active">
-            <span class="material-symbols-rounded">home</span>
-            <span>Home</span>
-        </a>
-        <a href="/sell">
-            <span class="material-symbols-rounded" style="color: var(--primary-color); font-size: 32px;">add_circle</span>
-            <span style="color: var(--primary-color);">Sell</span>
-        </a>
-        {% if current_user.is_authenticated %}
-            <a href="/dashboard">
-                <span class="material-symbols-rounded">person</span>
-                <span>Profile</span>
-            </a>
-        {% else %}
-            <a href="/login">
-                <span class="material-symbols-rounded">login</span>
-                <span>Login</span>
-            </a>
-        {% endif %}
-    </nav>
-
-<script>
-    const searchInput = document.getElementById('searchInput');
-    const categoryFilter = document.getElementById('categoryFilter'); // <--- NEW
-    const itemGrid = document.getElementById('itemGrid');
-    const noResults = document.getElementById('noResults');
-
-    // Master function that reads BOTH inputs
-    async function fetchItems() {
-        const query = searchInput.value.trim();
-        const category = categoryFilter.value; // <--- Get the dropdown value
-
-        try {
-            // Send both to the backend: /api/search?q=Toyota&category=motors
-            const response = await fetch(`/api/search?q=${query}&category=${category}`);
-            const items = await response.json();
-
-            // Clear current grid
-            itemGrid.innerHTML = '';
-
-            if (items.length === 0) {
-                noResults.style.display = 'block';
-            } else {
-                noResults.style.display = 'none';
-                
-                items.forEach(item => {
-                    const card = `
-                    <a href="/item/${item.id}" class="box" style="margin: 0; padding: 0; overflow: hidden; text-align: left; display: block; transition: transform 0.2s;">
-                        <div style="height: 250px; background: #eee; position: relative;">
-                            <img src="${item.image}" style="width: 100%; height: 100%; object-fit: cover;">
-                        </div>
-                        <div style="padding: 20px;">
-                            <h3 style="margin: 0 0 5px 0; font-size: 17px; color: var(--text-main);">${item.name}</h3>
-                            <div style="font-size: 16px; font-weight: 700; color: var(--primary-color); margin-top: 10px;">
-                                AED ${item.price}
-                            </div>
-                        </div>
-                    </a>
-                    `;
-                    itemGrid.innerHTML += card;
-                });
-            }
-        } catch (error) {
-            console.error("Search failed:", error);
-        }
-    }
-
-    // Listener 1: When user types
-    searchInput.addEventListener('input', fetchItems);
-
-    // Listener 2: When user changes category
-    categoryFilter.addEventListener('change', fetchItems);
-</script>
-
-</body>
-</html>
+            <a href="/item/{{ item.id }}" class
