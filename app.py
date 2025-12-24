@@ -280,7 +280,7 @@ def admin():
     # 1. SECURITY CHECK: Only allow YOUR email
     admin_email = 'ALKAABIHASAN@gmail.com'  # <--- REPLACE THIS WITH YOUR EMAIL
     
-    if current_user.email != admin_email:
+    if current_user.email.lower() != admin_email.lower():
         flash("Access denied. Admin only.", "error")
         return redirect(url_for('home'))
 
