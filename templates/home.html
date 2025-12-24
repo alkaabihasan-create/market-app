@@ -11,13 +11,13 @@
 
     <header style="
         background: #fff; 
-        padding: 10px 30px; /* Reduced padding */
+        padding: 10px 30px; 
         display: flex; 
         align-items: center; 
         justify-content: space-between; 
         border-bottom: 1px solid #f1f1f1;
         gap: 20px;
-        height: 70px; /* Fixed header height for consistency */
+        height: 70px; 
     ">
         
         <a href="/" class="logo" style="font-size: 24px; font-weight: 800; color: var(--primary-color); text-decoration: none; white-space: nowrap;">
@@ -27,36 +27,43 @@
         <div class="search-bar" style="
             flex: 1; 
             max-width: 600px; 
-            height: 44px; /* <--- FIXED STANDARD HEIGHT */
+            height: 44px; 
             display: flex; 
             align-items: center; 
-            background: #f5f5f7; /* Light gray background like modern apps */
-            border-radius: 8px; /* Slightly squarer corners (Standard) */
+            background: #f5f5f7; 
+            border-radius: 8px; 
             border: 1px solid transparent; 
-            transition: all 0.2s;
-            overflow: hidden; /* Keeps content inside the rounded corners */
-        " onmouseover="this.style.background='#eaeff2'" onmouseout="this.style.background='#f5f5f7'">
+            transition: all 0.2s ease; /* Smooth transition for shadow & color */
+            overflow: hidden;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05); /* Very subtle default shadow */
+        " 
+        onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'; this.style.transform='translateY(-1px)'" 
+        onmouseout="this.style.boxShadow='0 1px 2px rgba(0,0,0,0.05)'; this.style.transform='translateY(0)'">
             
             <div style="
                 background: #e1e1e6; 
                 height: 100%; 
                 display: flex; 
                 align-items: center; 
-                padding: 0 10px;
+                justify-content: center; /* <--- FIX: Centers text horizontally */
+                padding: 0 5px; /* Reduced padding slightly for tightness */
                 border-right: 1px solid #d1d1d6;
+                min-width: 80px; /* Ensures the gray box has a solid feel */
             ">
                 <select id="categoryFilter" style="
-                    width: auto; 
-                    max-width: 130px;
+                    width: 100%;
                     border: none; 
                     background: transparent; 
-                    font-size: 13px; 
+                    font-size: 14px; 
                     font-weight: 600;
                     color: #333; 
                     outline: none; 
                     cursor: pointer;
+                    text-align: center; /* <--- FIX: Forces text to center */
+                    text-align-last: center; /* Helper for some browsers */
                 ">
-                    <option value="all">All</option> <option value="motors">Motors</option>
+                    <option value="all">All</option>
+                    <option value="motors">Motors</option>
                     <option value="electronics">Electronics</option>
                     <option value="furniture">Furniture</option>
                     <option value="fashion">Fashion</option>
@@ -74,12 +81,12 @@
                 background: transparent; 
                 padding-left: 15px;
                 outline: none; 
-                font-size: 14px; 
+                font-size: 15px; 
                 color: #333;
             ">
 
-            <div style="padding: 0 15px; color: var(--primary-color); cursor: pointer;">
-                <span class="material-symbols-rounded" style="font-size: 22px;">search</span>
+            <div style="padding: 0 15px; color: var(--primary-color); cursor: pointer; display: flex; align-items: center;">
+                <span class="material-symbols-rounded" style="font-size: 24px;">search</span>
             </div>
         </div>
 
@@ -89,13 +96,14 @@
                     background: var(--primary-color); 
                     color: white; 
                     padding: 8px 20px; 
-                    border-radius: 6px; /* Matching the search bar corners */
+                    border-radius: 6px; 
                     text-decoration: none; 
                     display: flex; 
                     align-items: center; 
                     gap: 5px;
                     font-size: 14px;
                     font-weight: 600;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
                 ">
                     <span class="material-symbols-rounded" style="font-size: 18px;">add</span> Sell
                 </a>
@@ -106,8 +114,15 @@
                     <span class="material-symbols-rounded">logout</span>
                 </a>
             {% else %}
-                <a href="/login" style="color: var(--primary-color); text-decoration: none; font-weight: 600;">
-                    Login
+                <a href="/login" style="
+                    color: var(--primary-color); 
+                    text-decoration: none; 
+                    font-weight: 600; 
+                    display: flex; 
+                    align-items: center; 
+                    gap: 5px;
+                ">
+                    <span class="material-symbols-rounded">login</span> Login
                 </a>
             {% endif %}
         </nav>
