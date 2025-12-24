@@ -37,16 +37,19 @@
         " onmouseover="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.15)'" onmouseout="this.style.boxShadow='0 2px 5px rgba(0,0,0,0.1)'">
             
             <select id="categoryFilter" style="
-                width: 150px; 
-                flex-shrink: 0;
+                width: auto;  /* <--- CHANGE: Adapts to text size */
+                min-width: 130px; /* <--- CHANGE: Prevents it from being too small */
+                max-width: 200px; /* <--- CHANGE: Prevents it from being too huge */
                 height: 40px; 
-                padding-left: 15px; 
+                padding-left: 15px;
+                padding-right: 10px; /* Give text some breathing room */
                 border: none; 
                 background: transparent; 
                 font-size: 14px; 
                 color: #555; 
                 outline: none; 
                 cursor: pointer;
+                text-overflow: ellipsis; /* Adds '...' if text is still somehow too long */
             ">
                 <option value="all">All Categories</option>
                 <option value="motors">Motors</option>
