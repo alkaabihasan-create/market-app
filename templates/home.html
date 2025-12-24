@@ -16,7 +16,7 @@
         align-items: center; 
         justify-content: space-between; 
         border-bottom: 1px solid #f1f1f1;
-        gap: 20px; /* Ensures items don't touch */
+        gap: 20px;
     ">
         
         <a href="/" class="logo" style="font-size: 24px; font-weight: 800; color: var(--primary-color); text-decoration: none; white-space: nowrap;">
@@ -24,8 +24,8 @@
         </a>
 
         <div class="search-bar" style="
-            flex: 1; /* Takes all available space */
-            max-width: 600px; /* But stops growing at 600px */
+            flex: 1; 
+            max-width: 650px; 
             display: flex; 
             align-items: center; 
             background: #fff; 
@@ -37,8 +37,8 @@
         " onmouseover="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.15)'" onmouseout="this.style.boxShadow='0 2px 5px rgba(0,0,0,0.1)'">
             
             <select id="categoryFilter" style="
-                width: auto; 
-                min-width: 100px;
+                width: 150px; 
+                flex-shrink: 0;
                 height: 40px; 
                 padding-left: 15px; 
                 border: none; 
@@ -48,7 +48,7 @@
                 outline: none; 
                 cursor: pointer;
             ">
-                <option value="all">All</option>
+                <option value="all">All Categories</option>
                 <option value="motors">Motors</option>
                 <option value="electronics">Electronics</option>
                 <option value="furniture">Furniture</option>
@@ -69,6 +69,7 @@
                 outline: none; 
                 font-size: 15px; 
                 color: #333;
+                min-width: 0; /* Prevents overflow */
             ">
 
             <div style="
@@ -86,11 +87,9 @@
             </div>
         </div>
 
-        <nav class="nav-links" style="display: flex; gap: 20px; align-items: center;">
+        <nav class="nav-links" style="display: flex; gap: 15px; align-items: center;">
             {% if current_user.is_authenticated %}
-                <a href="/dashboard" style="text-decoration: none; color: #555; display: flex; align-items: center; gap: 5px; font-size: 14px; font-weight: 500;">
-                    <span class="material-symbols-rounded" style="font-size: 20px;">dashboard</span> My Ads
-                </a>
+                
                 <a href="/sell" class="btn-primary" style="
                     background: var(--primary-color); 
                     color: white; 
@@ -104,9 +103,15 @@
                 ">
                     <span class="material-symbols-rounded" style="font-size: 18px;">add</span> Sell
                 </a>
-                <a href="/logout" style="color: #999; text-decoration: none;">
+
+                <a href="/dashboard" style="text-decoration: none; color: #555; display: flex; align-items: center; gap: 5px; font-size: 14px; font-weight: 500;">
+                    <span class="material-symbols-rounded" style="font-size: 20px;">dashboard</span> My Ads
+                </a>
+
+                <a href="/logout" style="color: #999; text-decoration: none; margin-left: 5px;" title="Logout">
                     <span class="material-symbols-rounded">logout</span>
                 </a>
+
             {% else %}
                 <a href="/login" style="
                     color: var(--primary-color); 
@@ -141,7 +146,7 @@
                 display: block;
             ">
                 <div style="height: 220px; background: #f5f5f7; position: relative;">
-                    <img src="{{ item.image }}" style="width: 100%; height: 100%; object-fit: cover;">
+                    <img src="/{{ item.image }}" style="width: 100%; height: 100%; object-fit: cover;">
                 </div>
                 <div style="padding: 15px;">
                     <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 5px;">
@@ -157,4 +162,88 @@
                     </div>
                 </div>
             </a>
-            {% endfor %}   </div>
+            {% endfor %} 
+        </div> <div id="noResults" style="display: none; text-align: center; margin-top: 80px; padding: 40px;">
+            <span class="material-symbols-rounded" style="font-size: 64px; color: #ddd;">search_off</span>
+            <h3 style="color: #666; margin-top: 15px;">No items found</h3>
+            <p style="color: #999;">Try adjusting your search or category.</p>
+        </div>
+    </div>
+
+    <nav class="mobile-nav">
+        <a href="/" class="active">
+            <span class="material-symbols-rounded">home</span>
+            <span>Home</span>
+        </a>
+        <a href="/sell">
+            <span class="material-symbols-rounded" style="color: var(--primary-color); font-size: 32px;">add_circle</span>
+            <span style="color: var(--primary-color);">Sell</span>
+        </a>
+        {% if current_user.is_authenticated %}
+            <a href="/dashboard">
+                <span class="material-symbols-rounded">person</span>
+                <span>Profile</span>
+            </a>
+        {% else %}
+            <a href="/login">
+                <span class="material-symbols-rounded">login</span>
+                <span>Login</span>
+            </a>
+        {% endif %}
+    </nav>
+
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const itemGrid = document.getElementById('itemGrid');
+        const noResults = document.getElementById('noResults');
+
+        async function fetchItems() {
+            const query = searchInput.value.trim();
+            const category = categoryFilter.value;
+
+            try {
+                const response = await fetch(`/api/search?q=${query}&category=${category}`);
+                const items = await response.json();
+
+                itemGrid.innerHTML = '';
+
+                if (items.length === 0) {
+                    noResults.style.display = 'block';
+                } else {
+                    noResults.style.display = 'none';
+                    
+                    items.forEach(item => {
+                        const card = `
+                        <a href="/item/${item.id}" class="box" style="text-decoration: none; color: inherit; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); transition: transform 0.2s; display: block;">
+                            <div style="height: 220px; background: #f5f5f7; position: relative;">
+                                <img src="/${item.image}" style="width: 100%; height: 100%; object-fit: cover;">
+                            </div>
+                            <div style="padding: 15px;">
+                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 5px;">
+                                    <h3 style="margin: 0; font-size: 16px; font-weight: 500; color: #333; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 70%;">${item.name}</h3>
+                                    <span style="font-size: 12px; color: #888; background: #f1f1f1; padding: 2px 8px; border-radius: 10px;">${item.condition}</span>
+                                </div>
+                                <div style="font-size: 18px; font-weight: 700; color: var(--primary-color);">
+                                    AED ${item.price}
+                                </div>
+                                <div style="font-size: 12px; color: #aaa; margin-top: 8px;">
+                                    ${item.category}
+                                </div>
+                            </div>
+                        </a>
+                        `;
+                        itemGrid.innerHTML += card;
+                    });
+                }
+            } catch (error) {
+                console.error("Search failed:", error);
+            }
+        }
+
+        searchInput.addEventListener('input', fetchItems);
+        categoryFilter.addEventListener('change', fetchItems);
+    </script>
+
+</body>
+</html>
