@@ -3,6 +3,7 @@ import re
 import secrets
 from datetime import datetime, timedelta
 from werkzeug.utils import secure_filename
+import uuid # Needed for unique filenames
 
 # Flask & Extensions
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
@@ -14,22 +15,18 @@ from flask_bcrypt import Bcrypt
 app = Flask(__name__)
 
 # --- CONFIGURATION ---
-# FIX: Save images to 'static/uploads' so the website can display them publicly
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['SECRET_KEY'] = 'thisisasecretkey' 
 
 # --- SMART DATABASE CONNECTION ---
 database_url = os.environ.get('DATABASE_URL')
 
-# Fix for Render: They give "postgres://" but Python needs "postgresql://"
 if database_url and database_url.startswith("postgres://"):
     database_url = database_url.replace("postgres://", "postgresql://", 1)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url or 'sqlite:///elanat.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# FIX: Create the upload folder using the correct config variable
-# This prevents the "NameError" crash
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 # Initialize Extensions
@@ -65,11 +62,24 @@ class Item(db.Model):
     condition = db.Column(db.String(50), nullable=False)
     tags = db.Column(db.String(200), nullable=True)
     description = db.Column(db.Text, nullable=False)
+    
+    # MAIN IMAGE (Kept for Home Page/Dashboard compatibility)
     image = db.Column(db.String(100), nullable=False)
+    
     date_posted = db.Column(db.DateTime, default=datetime.utcnow)
     
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     owner = db.relationship('User', backref=db.backref('items', lazy=True))
+    
+    # RELATIONSHIP TO NEW IMAGE TABLE
+    # This allows us to say item.gallery to get all images
+    gallery = db.relationship('ItemImage', backref='item', lazy=True, cascade="all, delete-orphan")
+
+# NEW TABLE: STORES MULTIPLE IMAGES PER ITEM
+class ItemImage(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    image_file = db.Column(db.String(100), nullable=False)
+    item_id = db.Column(db.Integer, db.ForeignKey('item.id'), nullable=False)
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -79,7 +89,6 @@ def load_user(user_id):
 
 @app.route('/')
 def home():
-    # Fallback search for non-JS users
     query = request.args.get('q')
     if query:
         search_term = f"%{query}%"
@@ -106,27 +115,49 @@ def sell():
         description = request.form['description']
         condition = request.form['condition']
         tags = request.form['tags']
-        image = request.files['image']
+        
+        # MULTI-FILE UPLOAD HANDLING
+        # We look for a list of files named 'images' (we will update HTML next)
+        images = request.files.getlist('images')
 
-        if image:
-            filename = secure_filename(image.filename)
-            import uuid
-            unique_filename = str(uuid.uuid4()) + "_" + filename
-            
-            # FIX: Save to correct folder
-            image.save(os.path.join(app.config['UPLOAD_FOLDER'], unique_filename))
-            
-            # FIX: Path must start with static/uploads/
-            image_path = 'static/uploads/' + unique_filename
+        if images:
+            # 1. Create the Item first (we need its ID)
+            # We use the FIRST image as the "Main Image" for thumbnails
+            first_image_filename = ""
+            saved_filenames = []
 
+            for index, img in enumerate(images):
+                if img.filename == '': continue # Skip empty
+                
+                filename = secure_filename(img.filename)
+                unique_filename = str(uuid.uuid4()) + "_" + filename
+                img.save(os.path.join(app.config['UPLOAD_FOLDER'], unique_filename))
+                
+                # Path for DB
+                db_path = 'static/uploads/' + unique_filename
+                saved_filenames.append(db_path)
+
+                # Capture the first one for the main 'image' column
+                if index == 0:
+                    first_image_filename = db_path
+
+            # Create Item
             new_item = Item(
                 name=name, price=price, category=category, 
                 condition=condition, tags=tags, description=description, 
-                image=image_path, owner=current_user
+                image=first_image_filename, # Main Thumbnail
+                owner=current_user
             )
-            
             db.session.add(new_item)
+            db.session.commit() # Commit to generate item.id
+
+            # 2. Now save all images to the Gallery table
+            for filepath in saved_filenames:
+                gallery_img = ItemImage(image_file=filepath, item_id=new_item.id)
+                db.session.add(gallery_img)
+            
             db.session.commit()
+
             flash('Item listed successfully!', 'success')
             return redirect(url_for('dashboard'))
 
@@ -143,29 +174,24 @@ def register():
         password = request.form['password']
         
         if not re.match(r'^[a-zA-Z0-9_.]+$', username):
-            flash('Username can only contain letters, numbers, underscores, and dots.', 'error')
+            flash('Username format invalid.', 'error')
             return render_template('register.html')
-
         if len(username) < 3 or len(username) > 20:
-            flash('Username must be between 3 and 20 characters.', 'error')
+            flash('Username length invalid.', 'error')
             return render_template('register.html')
-
         if User.query.filter_by(username=username).first():
-            flash('Username already exists.', 'error')
+            flash('Username taken.', 'error')
             return render_template('register.html')
-
         if User.query.filter_by(email=email).first():
-            flash('Email already registered.', 'error')
+            flash('Email registered.', 'error')
             return redirect(url_for('login'))
 
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
         new_user = User(username=username, email=email, phone=phone, password=hashed_password)
-        
         db.session.add(new_user)
         db.session.commit()
-        flash('Account created! Please login.', 'success')
+        flash('Account created! Login.', 'success')
         return redirect(url_for('login'))
-        
     return render_template('register.html')
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -174,13 +200,11 @@ def login():
         email = request.form['email']
         password = request.form['password']
         user = User.query.filter_by(email=email).first()
-        
         if user and bcrypt.check_password_hash(user.password, password):
             login_user(user)
             return redirect(url_for('home'))
         else:
-            flash('Login Failed. Check email and password.', 'error')
-            
+            flash('Login Failed.', 'error')
     return render_template('login.html')
 
 @app.route('/logout')
@@ -200,10 +224,9 @@ def forgot_password():
             user.reset_token = token
             user.token_expiry = datetime.now() + timedelta(hours=1)
             db.session.commit()
-            
             reset_link = url_for('reset_password', token=token, _external=True)
-            print(f"\n --- SIMULATED EMAIL --- \n Reset Link: {reset_link} \n -----------------------\n")
-            flash('Reset link sent! Check your terminal.', 'success')
+            print(f"\n --- EMAIL --- \n Link: {reset_link} \n -------------\n")
+            flash('Reset link sent to console.', 'success')
             return redirect(url_for('login'))
         else:
             flash('Email not found.', 'error')
@@ -213,22 +236,19 @@ def forgot_password():
 def reset_password(token):
     user = User.query.filter_by(reset_token=token).first()
     if not user or user.token_expiry < datetime.now():
-        flash('Invalid or expired token.', 'error')
+        flash('Invalid/Expired token.', 'error')
         return redirect(url_for('forgot_password'))
-        
     if request.method == 'POST':
         new_password = request.form['password']
         if not is_strong_password(new_password):
-            flash('Password too weak!', 'error')
+            flash('Password weak.', 'error')
             return redirect(request.url)
-            
         user.password = bcrypt.generate_password_hash(new_password).decode('utf-8')
         user.reset_token = None
         user.token_expiry = None
         db.session.commit()
-        flash('Password reset! You can now login.', 'success')
+        flash('Password reset.', 'success')
         return redirect(url_for('login'))
-        
     return render_template('reset_password.html')
 
 # --- DELETE & DASHBOARD ---
@@ -239,7 +259,6 @@ def delete_item(id):
     if item.owner_id != current_user.id:
         flash("Permission denied.", "error")
         return redirect(url_for('dashboard'))
-    
     db.session.delete(item)
     db.session.commit()
     flash("Item deleted.", "success")
@@ -257,23 +276,18 @@ def dashboard():
 def admin():
     admin_email = 'alkaabihasan@gmail.com' 
     if current_user.email.lower() != admin_email.lower():
-        flash("Access denied. Admin only.", "error")
+        flash("Access denied.", "error")
         return redirect(url_for('home'))
-
     total_users = User.query.count()
     total_items = Item.query.count()
     total_value = db.session.query(func.sum(cast(Item.price, Integer))).scalar() or 0
-
     return render_template('admin.html', users=total_users, items=total_items, value=total_value)
 
 # --- API ---
 @app.route('/api/search')
 def search_api():
     query = request.args.get('q', '')
-    category = request.args.get('category', '')
-
     db_query = Item.query
-
     if query:
         search_term = f"%{query}%"
         db_query = db_query.filter(
@@ -281,10 +295,6 @@ def search_api():
             (Item.description.ilike(search_term)) |
             (Item.tags.ilike(search_term))
         )
-    
-    if category and category != 'all':
-        db_query = db_query.filter(Item.category == category)
-
     items = db_query.all()
     results = []
     for item in items:
