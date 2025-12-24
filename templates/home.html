@@ -13,11 +13,33 @@
         <div class="header-content">
             <a href="/" class="logo">eLanat.</a>
 
-            <div class="search-bar" style="flex-grow: 1; margin: 0 30px; display: flex; align-items: center; gap: 0; background: white; border: 1px solid #d2d2d7; border-radius: 12px; padding: 5px;">
+           <div class="search-bar" style="
+    flex-grow: 1; 
+    margin: 0 20px; 
+    display: flex; 
+    align-items: center; 
+    background: white; 
+    border-radius: 24px; /* Pill Shape */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Subtle Shadow */
+    border: 1px solid transparent; 
+    padding: 2px 10px;
+    max-width: 600px; /* Prevents it from getting too wide */
+    transition: box-shadow 0.2s;
+" onmouseover="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.2)'" onmouseout="this.style.boxShadow='0 2px 5px rgba(0,0,0,0.1)'">
     
-    <select id="categoryFilter" style="height: 40px; padding: 0 15px; border: none; border-right: 1px solid #e5e5e5; background: transparent; font-size: 14px; font-weight: 500; color: var(--text-main); outline: none; cursor: pointer; border-radius: 12px 0 0 12px;">
-        <option value="all">All Categories</option>
-        <option value="motors">Motors</option>
+    <select id="categoryFilter" style="
+        width: 130px; /* Fixed short width */
+        height: 40px; 
+        padding-left: 10px; 
+        border: none; 
+        background: transparent; 
+        font-size: 13px; 
+        font-weight: 500; 
+        color: #5f6368; /* Google Gray */
+        outline: none; 
+        cursor: pointer;
+    ">
+        <option value="all">All</option> <option value="motors">Motors</option>
         <option value="electronics">Electronics</option>
         <option value="furniture">Furniture</option>
         <option value="fashion">Fashion</option>
@@ -27,10 +49,24 @@
         <option value="pets">Pets</option>
     </select>
 
+    <div style="width: 1px; height: 24px; background: #dfe1e5; margin: 0 10px;"></div>
+
     <div style="position: relative; flex-grow: 1; display: flex; align-items: center;">
-        <span class="material-symbols-rounded" style="position: absolute; left: 12px; color: var(--text-secondary);">search</span>
-        <input type="text" id="searchInput" placeholder="Search for items..." style="width: 100%; height: 40px; margin: 0; padding-left: 40px; border: none; background: transparent; outline: none; font-size: 15px;">
+        <input type="text" id="searchInput" placeholder="Search..." style="
+            width: 100%; 
+            height: 40px; 
+            padding: 0; 
+            border: none; 
+            background: transparent; 
+            outline: none; 
+            font-size: 16px; 
+            color: #202124;
+        ">
     </div>
+
+    <span class="material-symbols-rounded" style="color: var(--primary-color); font-size: 24px; padding-right: 10px; cursor: pointer;">search</span>
+
+</div>
 
 </div>
 
