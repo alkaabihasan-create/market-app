@@ -58,7 +58,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(80), nullable=False)
     reset_token = db.Column(db.String(100), nullable=True)
     token_expiry = db.Column(db.DateTime, nullable=True)
-    items = db.relationship('Item', backref='owner', lazy=True)
+    
 
 # 2. The Item Table (Updated to link to a User)
 class Item(db.Model):
