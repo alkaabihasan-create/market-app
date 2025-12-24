@@ -8,6 +8,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from werkzeug.utils import secure_filename
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from flask_bcrypt import Bcrypt
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 
 def is_strong_password(password):
     # Rule: 8 chars, 1 uppercase, 1 lowercase, 1 number
@@ -85,6 +86,35 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 # --- ROUTES ---
+
+# --- LIVE SEARCH API ---
+@app.route('/api/search')
+def search_api():
+    query = request.args.get('q', '')
+    
+    if not query:
+        return jsonify([])
+
+    search_term = f"%{query}%"
+    items = Item.query.filter(
+        (Item.name.ilike(search_term)) | 
+        (Item.description.ilike(search_term)) |
+        (Item.tags.ilike(search_term))  # We can now search Tags too!
+    ).all()
+
+    # Convert database objects to a JSON list
+    results = []
+    for item in items:
+        results.append({
+            'id': item.id,
+            'name': item.name,
+            'price': item.price,
+            'image': item.image,
+            'category': item.category,
+            'condition': item.condition
+        })
+    
+    return jsonify(results)
 
 @app.route('/')
 def home():
@@ -338,7 +368,30 @@ def dashboard():
     user_items = Item.query.filter_by(owner_id=current_user.id).all()
     return render_template('dashboard.html', items=user_items)
 
+# --- LIVE SEARCH API ---
+@app.route('/api/search')
+def search_api():
+    query = request.args.get('q', '')
+    if not query: return jsonify([])
+    
+    search_term = f"%{query}%"
+    items = Item.query.filter(
+        (Item.name.ilike(search_term)) | 
+        (Item.description.ilike(search_term)) |
+        (Item.tags.ilike(search_term))
+    ).all()
 
+    results = []
+    for item in items:
+        results.append({
+            'id': item.id,
+            'name': item.name,
+            'price': item.price,
+            'image': item.image,
+            'condition': item.condition, # Make sure these exist in DB!
+            'category': item.category
+        })
+    return jsonify(results)
 
 
 if __name__ == '__main__':
