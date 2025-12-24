@@ -6,6 +6,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" />
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* DEFAULT (Desktop): Hide the bottom mobile menu */
+        .mobile-nav { display: none; }
+
+        /* MOBILE TWEAKS (Screens smaller than 768px) */
+        @media (max-width: 768px) {
+            
+            /* 1. Hide the top-right buttons (Zone 3) because we have the bottom bar */
+            header .nav-links { display: none !important; }
+
+            /* 2. Show the bottom mobile menu */
+            .mobile-nav { display: flex; }
+
+            /* 3. Adjust Header spacing so it's not so wide */
+            header { 
+                padding: 10px 15px !important; 
+                gap: 10px !important; 
+            }
+
+            /* 4. Make Search Bar take all remaining space */
+            .search-bar { 
+                margin: 0 !important;
+                width: 100% !important;
+            }
+            
+            /* 5. Hide the "All" text in category dropdown to save space (Icon only feel) */
+            #categoryFilter {
+                font-size: 12px !important;
+                padding-left: 5px !important;
+            }
+        }
+    </style>
 </head>
 <body>
 
