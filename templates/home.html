@@ -11,12 +11,13 @@
 
     <header style="
         background: #fff; 
-        padding: 15px 40px; 
+        padding: 10px 30px; /* Reduced padding */
         display: flex; 
         align-items: center; 
         justify-content: space-between; 
         border-bottom: 1px solid #f1f1f1;
         gap: 20px;
+        height: 70px; /* Fixed header height for consistency */
     ">
         
         <a href="/" class="logo" style="font-size: 24px; font-weight: 800; color: var(--primary-color); text-decoration: none; white-space: nowrap;">
@@ -25,106 +26,88 @@
 
         <div class="search-bar" style="
             flex: 1; 
-            max-width: 650px; 
+            max-width: 600px; 
+            height: 44px; /* <--- FIXED STANDARD HEIGHT */
             display: flex; 
             align-items: center; 
-            background: #fff; 
-            border-radius: 24px; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
-            border: 1px solid #eee; 
-            padding: 2px 5px;
-            transition: box-shadow 0.2s;
-        " onmouseover="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.15)'" onmouseout="this.style.boxShadow='0 2px 5px rgba(0,0,0,0.1)'">
+            background: #f5f5f7; /* Light gray background like modern apps */
+            border-radius: 8px; /* Slightly squarer corners (Standard) */
+            border: 1px solid transparent; 
+            transition: all 0.2s;
+            overflow: hidden; /* Keeps content inside the rounded corners */
+        " onmouseover="this.style.background='#eaeff2'" onmouseout="this.style.background='#f5f5f7'">
             
-            <select id="categoryFilter" style="
-                width: auto;  /* <--- CHANGE: Adapts to text size */
-                min-width: 130px; /* <--- CHANGE: Prevents it from being too small */
-                max-width: 200px; /* <--- CHANGE: Prevents it from being too huge */
-                height: 40px; 
-                padding-left: 15px;
-                padding-right: 10px; /* Give text some breathing room */
-                border: none; 
-                background: transparent; 
-                font-size: 14px; 
-                color: #555; 
-                outline: none; 
-                cursor: pointer;
-                text-overflow: ellipsis; /* Adds '...' if text is still somehow too long */
-            ">
-                <option value="all">All Categories</option>
-                <option value="motors">Motors</option>
-                <option value="electronics">Electronics</option>
-                <option value="furniture">Furniture</option>
-                <option value="fashion">Fashion</option>
-                <option value="mobile">Mobiles</option>
-                <option value="jobs">Jobs</option>
-                <option value="sports">Sports</option>
-                <option value="pets">Pets</option>
-            </select>
-
-            <div style="width: 1px; height: 20px; background: #e0e0e0; margin: 0 10px;"></div>
-
-            <input type="text" id="searchInput" placeholder="Search for anything..." style="
-                flex: 1; 
-                height: 150px; 
-                border: none; 
-                background: transparent; 
-                outline: none; 
-                font-size: 15px; 
-                color: #333;
-                min-width: 0; /* Prevents overflow */
-            ">
-
             <div style="
-                background: var(--primary-color); 
-                width: 32px; 
-                height: 32px; 
-                border-radius: 50%; 
+                background: #e1e1e6; 
+                height: 100%; 
                 display: flex; 
                 align-items: center; 
-                justify-content: center; 
-                margin-right: 5px;
-                cursor: pointer;
+                padding: 0 10px;
+                border-right: 1px solid #d1d1d6;
             ">
-                <span class="material-symbols-rounded" style="color: white; font-size: 20px;">search</span>
+                <select id="categoryFilter" style="
+                    width: auto; 
+                    max-width: 130px;
+                    border: none; 
+                    background: transparent; 
+                    font-size: 13px; 
+                    font-weight: 600;
+                    color: #333; 
+                    outline: none; 
+                    cursor: pointer;
+                ">
+                    <option value="all">All</option> <option value="motors">Motors</option>
+                    <option value="electronics">Electronics</option>
+                    <option value="furniture">Furniture</option>
+                    <option value="fashion">Fashion</option>
+                    <option value="mobile">Mobiles</option>
+                    <option value="jobs">Jobs</option>
+                    <option value="sports">Sports</option>
+                    <option value="pets">Pets</option>
+                </select>
+            </div>
+
+            <input type="text" id="searchInput" placeholder="Search..." style="
+                flex: 1; 
+                height: 100%; 
+                border: none; 
+                background: transparent; 
+                padding-left: 15px;
+                outline: none; 
+                font-size: 14px; 
+                color: #333;
+            ">
+
+            <div style="padding: 0 15px; color: var(--primary-color); cursor: pointer;">
+                <span class="material-symbols-rounded" style="font-size: 22px;">search</span>
             </div>
         </div>
 
         <nav class="nav-links" style="display: flex; gap: 15px; align-items: center;">
             {% if current_user.is_authenticated %}
-                
                 <a href="/sell" class="btn-primary" style="
                     background: var(--primary-color); 
                     color: white; 
                     padding: 8px 20px; 
-                    border-radius: 20px; 
+                    border-radius: 6px; /* Matching the search bar corners */
                     text-decoration: none; 
                     display: flex; 
                     align-items: center; 
                     gap: 5px;
                     font-size: 14px;
+                    font-weight: 600;
                 ">
                     <span class="material-symbols-rounded" style="font-size: 18px;">add</span> Sell
                 </a>
-
                 <a href="/dashboard" style="text-decoration: none; color: #555; display: flex; align-items: center; gap: 5px; font-size: 14px; font-weight: 500;">
                     <span class="material-symbols-rounded" style="font-size: 20px;">dashboard</span> My Ads
                 </a>
-
                 <a href="/logout" style="color: #999; text-decoration: none; margin-left: 5px;" title="Logout">
                     <span class="material-symbols-rounded">logout</span>
                 </a>
-
             {% else %}
-                <a href="/login" style="
-                    color: var(--primary-color); 
-                    text-decoration: none; 
-                    font-weight: 600; 
-                    display: flex; 
-                    align-items: center; 
-                    gap: 5px;
-                ">
-                    <span class="material-symbols-rounded">login</span> Login
+                <a href="/login" style="color: var(--primary-color); text-decoration: none; font-weight: 600;">
+                    Login
                 </a>
             {% endif %}
         </nav>
