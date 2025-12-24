@@ -1,64 +1,49 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Admin Command Center</title>
+    <title>Admin Panel - eLanat.</title>
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" />
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>
+<body style="background-color: #1a1a2e; color: white;">
 
-    <header>
-        <div class="header-content">
-            <a href="/" class="logo">eLanat. Admin</a>
-            <nav class="nav-links">
-                <a href="/"><span class="material-symbols-rounded">home</span> Back to Site</a>
-            </nav>
+    <header style="padding: 20px 40px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center;">
+        <div style="font-size: 24px; font-weight: 800; color: white;">
+            eLanat. <span style="font-size: 14px; font-weight: 400; opacity: 0.5; margin-left: 10px;">ADMIN CONSOLE</span>
         </div>
+        <a href="/" style="color: rgba(255,255,255,0.7); text-decoration: none;">Exit to Site &rarr;</a>
     </header>
 
-    <div class="container">
-        <h1 style="margin-bottom: 30px; font-size: 28px;">Platform Statistics</h1>
+    <div class="container" style="max-width: 1000px; margin: 50px auto; padding: 0 20px;">
+        
+        <h2 style="margin-bottom: 30px;">Platform Overview</h2>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px;">
             
-            <div class="box" style="margin: 0; text-align: left; border-left: 5px solid var(--primary-color);">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <div style="color: var(--text-secondary); font-size: 14px; text-transform: uppercase; font-weight: 600;">Total Users</div>
-                        <div style="font-size: 36px; font-weight: 700; color: var(--text-main); margin-top: 5px;">{{ users }}</div>
-                    </div>
-                    <span class="material-symbols-rounded" style="font-size: 48px; color: var(--primary-color); opacity: 0.2;">group</span>
-                </div>
+            <div style="background: rgba(255,255,255,0.05); padding: 30px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1);">
+                <div style="font-size: 14px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px;">Total Users</div>
+                <div style="font-size: 48px; font-weight: 700; margin-top: 10px;">{{ users }}</div>
             </div>
 
-            <div class="box" style="margin: 0; text-align: left; border-left: 5px solid var(--accent-color);">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <div style="color: var(--text-secondary); font-size: 14px; text-transform: uppercase; font-weight: 600;">Live Ads</div>
-                        <div style="font-size: 36px; font-weight: 700; color: var(--text-main); margin-top: 5px;">{{ items }}</div>
-                    </div>
-                    <span class="material-symbols-rounded" style="font-size: 48px; color: var(--accent-color); opacity: 0.2;">inventory_2</span>
-                </div>
+            <div style="background: rgba(255,255,255,0.05); padding: 30px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1);">
+                <div style="font-size: 14px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px;">Active Ads</div>
+                <div style="font-size: 48px; font-weight: 700; margin-top: 10px; color: #4facfe;">{{ items }}</div>
             </div>
 
-            <div class="box" style="margin: 0; text-align: left; border-left: 5px solid #34C759;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <div style="color: var(--text-secondary); font-size: 14px; text-transform: uppercase; font-weight: 600;">Market Value</div>
-                        <div style="font-size: 36px; font-weight: 700; color: var(--text-main); margin-top: 5px;">AED {{ value }}</div>
-                    </div>
-                    <span class="material-symbols-rounded" style="font-size: 48px; color: #34C759; opacity: 0.2;">payments</span>
-                </div>
+            <div style="background: rgba(255,255,255,0.05); padding: 30px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1);">
+                <div style="font-size: 14px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px;">Total Value</div>
+                <div style="font-size: 48px; font-weight: 700; margin-top: 10px; color: #00f260;">AED {{ value }}</div>
             </div>
 
         </div>
 
-        <h2 style="margin-top: 40px; font-size: 20px;">Quick Actions</h2>
-        <div class="box" style="margin: 20px 0; text-align: left;">
-            <p>You are viewing this because you are logged in as the Administrator.</p>
-            <a href="/sell" class="btn-primary">Post Official Ad</a>
+        <div style="margin-top: 50px; padding: 20px; background: rgba(255,255,0,0.1); border-radius: 12px; color: #ffeb3b; display: flex; align-items: center; gap: 15px;">
+            <span class="material-symbols-rounded">warning</span>
+            <span>You are logged in as a Super Admin. You have full control over the platform data.</span>
         </div>
+
     </div>
 
 </body>
