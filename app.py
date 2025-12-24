@@ -345,15 +345,20 @@ def dashboard():
 @app.route('/api/search')
 def search_api():
     query = request.args.get('q', '')
-    if not query: return jsonify([])
     
-    search_term = f"%{query}%"
-    items = Item.query.filter(
-        (Item.name.ilike(search_term)) | 
-        (Item.description.ilike(search_term)) |
-        (Item.tags.ilike(search_term))
-    ).all()
+    if query:
+        # If user typed something, search for it
+        search_term = f"%{query}%"
+        items = Item.query.filter(
+            (Item.name.ilike(search_term)) | 
+            (Item.description.ilike(search_term)) |
+            (Item.tags.ilike(search_term))
+        ).all()
+    else:
+        # If query is empty, return ALL items (Restore default view)
+        items = Item.query.all()
 
+    # Convert to JSON
     results = []
     for item in items:
         results.append({
@@ -361,9 +366,10 @@ def search_api():
             'name': item.name,
             'price': item.price,
             'image': item.image,
-            'condition': item.condition, # Make sure these exist in DB!
-            'category': item.category
+            'category': item.category,
+            'condition': item.condition
         })
+    
     return jsonify(results)
 
 
