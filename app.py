@@ -311,18 +311,6 @@ def dashboard():
     user_items = Item.query.filter_by(owner_id=current_user.id).all()
     return render_template('dashboard.html', items=user_items)
 
-@app.route('/delete/<int:id>')
-@login_required
-def delete_item(id):
-    item = Item.query.get_or_404(id)
-    if item.owner_id != current_user.id:
-        flash('Permission denied.', 'error')
-        return redirect(url_for('home'))
-    
-    db.session.delete(item)
-    db.session.commit()
-    flash('Item deleted.', 'success')
-    return redirect(url_for('dashboard'))
 
 
 
