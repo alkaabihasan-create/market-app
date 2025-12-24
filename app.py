@@ -277,24 +277,22 @@ def delete_item(id):
 @app.route('/admin')
 @login_required
 def admin():
-    # 1. SECURITY CHECK: Only allow YOUR email
-    admin_email = 'ALKAABIHASAN@gmail.com'  # <--- REPLACE THIS WITH YOUR EMAIL
+    # 1. Define the authorized email
+    # MAKE SURE THIS IS YOUR EXACT EMAIL
+    admin_email = 'your_email@gmail.com' 
     
+    # 2. DEBUG: Print what is happening to the screen
+    # This will show a message on your site telling us the mismatch
     if current_user.email.lower() != admin_email.lower():
-        flash("Access denied. Admin only.", "error")
+        flash(f"Debug Mode: I see you are logged in as '{current_user.email}', but I am looking for '{admin_email}'", "error")
         return redirect(url_for('home'))
 
-    # 2. GATHER STATISTICS
+    # 3. If match, show dashboard
     total_users = User.query.count()
     total_items = Item.query.count()
-    # Calculate sum of all prices (handle case where DB is empty)
     total_value = db.session.query(func.sum(Item.price)).scalar() or 0
 
-    # 3. SHOW THE PAGE
-    return render_template('admin.html', 
-                         users=total_users, 
-                         items=total_items, 
-                         value=total_value)
+    return render_template('admin.html', users=total_users, items=total_items, value=total_value)
 
 
 # Create DB if not exists
