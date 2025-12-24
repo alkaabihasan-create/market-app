@@ -6,34 +6,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" />
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <style>
+   <style>
         /* DEFAULT (Desktop): Hide the bottom mobile menu */
         .mobile-nav { display: none; }
 
         /* MOBILE TWEAKS (Screens smaller than 768px) */
         @media (max-width: 768px) {
             
-            /* 1. Hide the top-right buttons (Zone 3) because we have the bottom bar */
-            header .nav-links { display: none !important; }
-
-            /* 2. Show the bottom mobile menu */
-            .mobile-nav { display: flex; }
-
-            /* 3. Adjust Header spacing so it's not so wide */
-            header { 
-                padding: 10px 15px !important; 
-                gap: 10px !important; 
+            /* 1. Stack Logo on top of Search Bar */
+            header {
+                flex-direction: column !important; /* Stack vertically */
+                height: auto !important; /* Let it grow tall to fit both */
+                padding: 15px 20px !important; 
+                gap: 15px !important; 
+                align-items: stretch !important; /* Make items full width */
             }
 
-            /* 4. Make Search Bar take all remaining space */
+            /* 2. Center the Logo (Optional, looks nice on mobile) */
+            .logo {
+                text-align: center;
+                margin-bottom: 5px;
+            }
+
+            /* 3. Hide the top-right buttons (we have bottom nav) */
+            header .nav-links { display: none !important; }
+
+            /* 4. Show the bottom mobile menu */
+            .mobile-nav { display: flex; }
+
+            /* 5. Make Search Bar take full width */
             .search-bar { 
                 margin: 0 !important;
                 width: 100% !important;
+                max-width: none !important; /* Remove the 600px limit */
             }
             
-            /* 5. Hide the "All" text in category dropdown to save space (Icon only feel) */
+            /* 6. Compact Category Dropdown for Mobile */
             #categoryFilter {
-                font-size: 12px !important;
+                font-size: 13px !important;
                 padding-left: 5px !important;
             }
         }
