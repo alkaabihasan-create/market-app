@@ -15,7 +15,7 @@
 
             <form action="/" class="search-bar" style="flex-grow: 1; margin: 0 40px;">
                 <div style="position: relative;">
-                    <input type="text" name="q" placeholder="Search..." style="margin-bottom: 0; padding-left: 40px;">
+                    <input type="text" id="searchInput" name="q" placeholder="What are you looking for?" style="margin-bottom: 0; padding-left: 40px;">
                     <span class="material-symbols-rounded" style="position: absolute; left: 10px; top: 12px; color: var(--text-secondary);">search</span>
                 </div>
             </form>
@@ -43,7 +43,7 @@
     <div class="container">
         <h2 style="font-size: 24px; font-weight: 600; margin-bottom: 20px; color: var(--text-main);">Fresh Recommendations</h2>
         
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px;">
+        <div id="itemGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px;">
             {% for item in items %}
             <a href="/item/{{ item.id }}" class="box" style="margin: 0; padding: 0; overflow: hidden; text-align: left; display: block; transition: transform 0.2s;">
                 <div style="height: 250px; background: #eee; position: relative;">
@@ -58,6 +58,12 @@
             </a>
             {% endfor %}
         </div>
+
+        <div id="noResults" style="display: none; text-align: center; margin-top: 50px; padding: 40px;">
+            <span class="material-symbols-rounded" style="font-size: 64px; color: #ccc;">search_off</span>
+            <h3 style="color: var(--text-secondary); margin-top: 10px;">No items found</h3>
+            <p style="color: #888;">Try searching for a different keyword.</p>
+        </div>
     </div>
 
     <nav class="mobile-nav">
@@ -65,12 +71,10 @@
             <span class="material-symbols-rounded">home</span>
             <span>Home</span>
         </a>
-        
         <a href="/sell">
             <span class="material-symbols-rounded" style="color: var(--primary-color); font-size: 32px;">add_circle</span>
             <span style="color: var(--primary-color);">Sell</span>
         </a>
-
         {% if current_user.is_authenticated %}
             <a href="/dashboard">
                 <span class="material-symbols-rounded">person</span>
@@ -83,6 +87,57 @@
             </a>
         {% endif %}
     </nav>
+
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const itemGrid = document.getElementById('itemGrid');
+        const noResults = document.getElementById('noResults');
+
+        searchInput.addEventListener('input', async function() {
+            const query = this.value.trim();
+
+            if (query.length === 0) {
+                // If input is cleared, simple reload to bring back original state
+                window.location.reload(); 
+                return;
+            }
+
+            // Call the API
+            try {
+                const response = await fetch(`/api/search?q=${query}`);
+                const items = await response.json();
+
+                // Clear current items
+                itemGrid.innerHTML = '';
+
+                if (items.length === 0) {
+                    noResults.style.display = 'block';
+                } else {
+                    noResults.style.display = 'none';
+                    
+                    // Rebuild the items using your EXACT design structure
+                    items.forEach(item => {
+                        const card = `
+                        <a href="/item/${item.id}" class="box" style="margin: 0; padding: 0; overflow: hidden; text-align: left; display: block; transition: transform 0.2s;">
+                            <div style="height: 250px; background: #eee; position: relative;">
+                                <img src="${item.image}" style="width: 100%; height: 100%; object-fit: cover;">
+                            </div>
+                            <div style="padding: 20px;">
+                                <h3 style="margin: 0 0 5px 0; font-size: 17px; color: var(--text-main);">${item.name}</h3>
+                                <div style="font-size: 16px; font-weight: 700; color: var(--primary-color); margin-top: 10px;">
+                                    AED ${item.price}
+                                </div>
+                            </div>
+                        </a>
+                        `;
+                        itemGrid.innerHTML += card;
+                    });
+                }
+            } catch (error) {
+                console.error("Search failed:", error);
+            }
+        });
+    </script>
 
 </body>
 </html>
