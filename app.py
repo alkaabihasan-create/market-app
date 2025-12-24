@@ -80,23 +80,22 @@ def load_user(user_id):
 
 @app.route('/')
 def home():
+    # 1. Get the search term from the URL (e.g., /?q=Toyota)
     query = request.args.get('q')
-    all_items = Item.query.all()
 
-    if not query:
-        return render_template('home.html', items=all_items)
+    if query:
+        # 2. If user searched, filter items (Case Insensitive)
+        # We look in the Name OR the Description
+        search_term = f"%{query}%"
+        items = Item.query.filter(
+            (Item.name.ilike(search_term)) | 
+            (Item.description.ilike(search_term))
+        ).all()
+    else:
+        # 3. No search? Show everything
+        items = Item.query.all()
 
-    # Search Logic
-    search_terms = query.lower().split()
-    scored_results = []
-    for item in all_items:
-        score = 0
-        if any(term in item.name.lower() for term in search_terms): score += 10
-        if any(term in item.description.lower() for term in search_terms): score += 5
-        if score > 0: scored_results.append((score, item))
-    
-    scored_results.sort(key=lambda x: x[0], reverse=True)
-    return render_template('home.html', items=[r[1] for r in scored_results])
+    return render_template('home.html', items=items)
 
 @app.route('/item/<int:id>')
 def item_detail(id):
@@ -251,6 +250,28 @@ def reset_password(token):
         return redirect(url_for('login'))
         
     return render_template('reset_password.html')
+
+
+# --- DELETE ITEM ---
+@app.route('/delete/<int:id>')
+@login_required
+def delete_item(id):
+    # 1. Find the item
+    item = Item.query.get_or_404(id)
+
+    # 2. SECURITY: Check if the current user actually owns this item
+    # (We don't want User A deleting User B's items!)
+    if item.owner_id != current_user.id:
+        flash("You do not have permission to delete this item.", "error")
+        return redirect(url_for('dashboard'))
+
+    # 3. Delete it
+    db.session.delete(item)
+    db.session.commit()
+    
+    flash("Item deleted successfully.", "success")
+    return redirect(url_for('dashboard'))
+
 
 # --- ADMIN DASHBOARD ---
 @app.route('/admin')
