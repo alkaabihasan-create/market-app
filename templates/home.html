@@ -16,11 +16,11 @@
             
             /* 1. Stack Logo on top of Search Bar */
             header {
-                flex-direction: column !important; /* Stack vertically */
-                height: auto !important; /* Let it grow tall to fit both */
+                flex-direction: column !important; 
+                height: auto !important; 
                 padding: 15px 20px !important; 
                 gap: 15px !important; 
-                align-items: stretch !important; /* Make items full width */
+                align-items: stretch !important; 
             }
 
             /* 2. Center the Logo */
@@ -29,7 +29,7 @@
                 margin-bottom: 5px;
             }
 
-            /* 3. Hide the top-right buttons (we have bottom nav) */
+            /* 3. Hide the top-right buttons */
             header .nav-links { display: none !important; }
 
             /* 4. Show the bottom mobile menu */
@@ -77,18 +77,20 @@
         onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'; this.style.transform='translateY(-1px)'" 
         onmouseout="this.style.boxShadow='0 1px 2px rgba(0,0,0,0.05)'; this.style.transform='translateY(0)'">
             
-            <input type="text" id="searchInput" placeholder="Search..." style="
+            <input type="text" id="searchInput" placeholder="Search for anything..." style="
                 flex: 1; 
                 height: 100%; 
                 border: none; 
                 background: transparent; 
-                padding-left: 20px; /* More padding since it's the first element now */
+                margin: 0; /* Removes default browser margin */
+                padding: 0 20px; /* Top/Bottom 0 ensures perfect centering */
                 outline: none; 
-                font-size: 15px; 
+                font-size: 16px; /* Prevents zoom on mobile */
                 color: #333;
+                line-height: normal; /* Fixes vertical float */
             ">
 
-            <div style="padding: 0 15px; color: var(--primary-color); cursor: pointer; display: flex; align-items: center;">
+            <div style="padding: 0 15px; color: var(--primary-color); cursor: pointer; display: flex; align-items: center; justify-content: center; height: 100%;">
                 <span class="material-symbols-rounded" style="font-size: 24px;">search</span>
             </div>
         </div>
