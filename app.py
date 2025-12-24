@@ -1,11 +1,11 @@
 import os
 import re  # <--- THIS WAS MISSING
 import secrets # Used for the forgot password token
-from sqlalchemy import func
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import func, cast, Integer
 from datetime import datetime, timedelta
 from flask import Flask, render_template, request, redirect, url_for, flash
 from werkzeug.utils import secure_filename
-from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from flask_bcrypt import Bcrypt
 
@@ -289,7 +289,8 @@ def admin():
     # 3. Calculate Stats
     total_users = User.query.count()
     total_items = Item.query.count()
-    total_value = db.session.query(func.sum(Item.price)).scalar() or 0
+    # Calculate sum (Convert "String" Price to "Integer" first)
+    total_value = db.session.query(func.sum(cast(Item.price, Integer))).scalar() or 0
 
     return render_template('admin.html', 
                          users=total_users, 
