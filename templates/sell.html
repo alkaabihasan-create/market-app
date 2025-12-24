@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Sell on eLanat.</title>
+    <title>Sell on eLanat</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" />
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
@@ -10,7 +10,7 @@
 
     <header>
         <div class="header-content">
-            <span class="logo">eLanat.</span>
+            <span class="logo">Post Ad</span>
             <nav class="nav-links">
                 <a href="/"><span class="material-symbols-rounded">close</span> Cancel</a>
             </nav>
@@ -19,27 +19,53 @@
 
     <div class="container">
         <div class="box" style="max-width: 600px; margin-top: 20px; text-align: left;">
+            <h1 style="font-size: 22px; margin-bottom: 20px; color: var(--text-main);">Item Details</h1>
+            
             <form method="POST" enctype="multipart/form-data">
+                
                 <label style="font-weight: 600; font-size: 14px; margin-bottom: 8px; display: block;">Item Name</label>
-                <input type="text" name="name" placeholder="What are you selling?" required>
+                <input type="text" name="name" placeholder="e.g. iPhone 14 Pro Max" required>
 
                 <label style="font-weight: 600; font-size: 14px; margin-bottom: 8px; display: block;">Price (AED)</label>
                 <input type="number" name="price" placeholder="0" required>
-                 <label style="font-weight: 600; font-size: 14px; margin-bottom: 8px; display: block;">Category</label>
-                 <select name="category">
-                    <option value="motors">Motors</option>
-                    <option value="electronics">Electronics</option>
-                    <option value="furniture">Furniture</option>
-                    <option value="fashion">Fashion</option>
-                    <option value="sports">Sports</option>
+
+                <label style="font-weight: 600; font-size: 14px; margin-bottom: 8px; display: block;">Category</label>
+                <select name="category" required>
+                    <option value="" disabled selected>Select Category</option>
+                    <option value="motors">Motors (Cars, Bikes)</option>
+                    <option value="electronics">Electronics & Appliances</option>
+                    <option value="furniture">Furniture & Home</option>
+                    <option value="fashion">Fashion & Beauty</option>
+                    <option value="mobile">Mobiles & Tablets</option>
+                    <option value="jobs">Jobs & Services</option>
+                    <option value="sports">Sports & Equipment</option>
+                    <option value="pets">Pets</option>
                 </select>
-                 <label style="font-weight: 600; font-size: 14px; margin-bottom: 8px; display: block;">Description</label>
-                 <textarea name="description" rows="4"></textarea>
+
+                <label style="font-weight: 600; font-size: 14px; margin-bottom: 8px; display: block;">Condition</label>
+                <select name="condition" required>
+                    <option value="" disabled selected>Select Condition</option>
+                    <option value="New">Brand New</option>
+                    <option value="Like New">Like New (Open Box)</option>
+                    <option value="Good">Good (Minor usage)</option>
+                    <option value="Fair">Fair (Visible usage)</option>
+                    <option value="Poor">Poor (Heavy wear)</option>
+                </select>
+
+                <label style="font-weight: 600; font-size: 14px; margin-bottom: 8px; display: block;">Tags (Keywords)</label>
+                <input type="text" name="tags" placeholder="e.g. Apple, 256GB, Warranty" style="font-size: 14px;">
+
+                <label style="font-weight: 600; font-size: 14px; margin-bottom: 8px; display: block;">
+                    Description <span style="font-weight: 400; color: #999;">(Max 500 chars)</span>
+                </label>
+                <textarea name="description" rows="5" maxlength="500" placeholder="Describe your item..." required oninput="updateCount(this)"></textarea>
+                <div id="charCount" style="text-align: right; font-size: 12px; color: #999; margin-bottom: 15px;">0 / 500</div>
 
                 <label style="font-weight: 600; font-size: 14px; margin-bottom: 8px; display: block;">Photo</label>
                 <div style="background: #f5f5f7; padding: 20px; border-radius: 12px; text-align: center; border: 2px dashed #d2d2d7;">
                     <span class="material-symbols-rounded" style="font-size: 32px; color: var(--text-secondary);">add_a_photo</span>
                     <input type="file" name="image" accept="image/*" required style="margin-top: 10px;">
+                    <p style="font-size: 12px; color: #999; margin-top: 5px;">(Multi-photo upload coming soon)</p>
                 </div>
 
                 <button type="submit" class="btn-primary" style="width: 100%; margin-top: 20px; font-size: 16px;">
@@ -49,10 +75,16 @@
         </div>
     </div>
 
+    <script>
+        function updateCount(field) {
+            document.getElementById('charCount').innerText = field.value.length + " / 500";
+        }
+    </script>
+
     <nav class="mobile-nav">
         <a href="/"><span class="material-symbols-rounded">home</span><span>Home</span></a>
         <a href="/sell" class="active">
-             <span class="material-symbols-rounded" style="font-size: 32px;">add_circle</span><span>Sell</span>
+             <span class="material-symbols-rounded" style="color: var(--primary-color); font-size: 32px;">add_circle</span><span>Sell</span>
         </a>
         {% if current_user.is_authenticated %}
             <a href="/dashboard"><span class="material-symbols-rounded">person</span><span>Profile</span></a>

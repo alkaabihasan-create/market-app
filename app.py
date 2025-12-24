@@ -64,12 +64,20 @@ class User(db.Model, UserMixin):
 class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    price = db.Column(db.String(50), nullable=False)
+    price = db.Column(db.Integer, nullable=False)
     category = db.Column(db.String(50), nullable=False)
+    
+    # --- NEW FIELDS ---
+    condition = db.Column(db.String(50), nullable=False)  # New/Used
+    tags = db.Column(db.String(200), nullable=True)       # e.g. "Toyota, Camry, 2022"
+    # ------------------
+    
     description = db.Column(db.Text, nullable=False)
-    image = db.Column(db.String(200), nullable=False)
-    # Link to the User table
+    image = db.Column(db.String(100), nullable=False)
+    date_posted = db.Column(db.DateTime, default=datetime.utcnow)
+    
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    owner = db.relationship('User', backref=db.backref('items', lazy=True))
 
 # This helps Flask find the user by ID
 @login_manager.user_loader
@@ -103,29 +111,48 @@ def item_detail(id):
     return render_template('detail.html', item=item)
 
 @app.route('/sell', methods=['GET', 'POST'])
-@login_required # <--- NEW: Only logged in users can see this page!
-def sell_item():
+@login_required
+def sell():
     if request.method == 'POST':
         name = request.form['name']
         price = request.form['price']
-        category = request.form.get('category')
+        category = request.form['category']
         description = request.form['description']
         
-        image_url = "https://via.placeholder.com/300"
-        if 'image' in request.files:
-            file = request.files['image']
-            if file.filename != '':
-                filename = secure_filename(file.filename)
-                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                image_url = f"/static/uploads/{filename}"
+        # --- GET NEW DATA ---
+        condition = request.form['condition']
+        tags = request.form['tags']
+        # --------------------
+        
+        image = request.files['image']
 
-        # Assign the 'owner' to the current logged-in user
-        new_item = Item(name=name, price=price, category=category, description=description, image=image_url, owner=current_user)
-        db.session.add(new_item)
-        db.session.commit()
-        return redirect(url_for('home'))
+        if image:
+            filename = secure_filename(image.filename)
+            # Ensure unique filename to prevent overwrite
+            import uuid
+            unique_filename = str(uuid.uuid4()) + "_" + filename
+            image.save(os.path.join(app.config['UPLOAD_FOLDER'], unique_filename))
+            image_path = 'uploads/' + unique_filename
+
+            # Create Item with NEW fields
+            new_item = Item(
+                name=name, 
+                price=price, 
+                category=category, 
+                condition=condition, # <--- Saved here
+                tags=tags,           # <--- Saved here
+                description=description, 
+                image=image_path, 
+                owner=current_user
+            )
+            
+            db.session.add(new_item)
+            db.session.commit()
+            flash('Item listed successfully!', 'success')
+            return redirect(url_for('dashboard'))
 
     return render_template('sell.html')
+
 
 # --- AUTHENTICATION ROUTES ---
 
