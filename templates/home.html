@@ -13,9 +13,9 @@
         <div class="header-content">
             <a href="/" class="logo">eLanat.</a>
 
-            <div class="search-bar" style="flex-grow: 1; margin: 0 40px; display: flex; gap: 10px;">
+            <div class="search-bar" style="flex-grow: 1; margin: 0 30px; display: flex; align-items: center; gap: 0; background: white; border: 1px solid #d2d2d7; border-radius: 12px; padding: 5px;">
     
-    <select id="categoryFilter" style="width: 150px; padding: 0 15px; border: none; border-right: 1px solid #ddd; background: transparent; font-size: 14px; outline: none; cursor: pointer;">
+    <select id="categoryFilter" style="height: 40px; padding: 0 15px; border: none; border-right: 1px solid #e5e5e5; background: transparent; font-size: 14px; font-weight: 500; color: var(--text-main); outline: none; cursor: pointer; border-radius: 12px 0 0 12px;">
         <option value="all">All Categories</option>
         <option value="motors">Motors</option>
         <option value="electronics">Electronics</option>
@@ -27,9 +27,9 @@
         <option value="pets">Pets</option>
     </select>
 
-    <div style="position: relative; flex-grow: 1;">
-        <input type="text" id="searchInput" placeholder="What are you looking for?" style="margin-bottom: 0; padding-left: 35px; border: none; width: 100%;">
-        <span class="material-symbols-rounded" style="position: absolute; left: 0; top: 12px; color: var(--text-secondary);">search</span>
+    <div style="position: relative; flex-grow: 1; display: flex; align-items: center;">
+        <span class="material-symbols-rounded" style="position: absolute; left: 12px; color: var(--text-secondary);">search</span>
+        <input type="text" id="searchInput" placeholder="Search for items..." style="width: 100%; height: 40px; margin: 0; padding-left: 40px; border: none; background: transparent; outline: none; font-size: 15px;">
     </div>
 
 </div>
