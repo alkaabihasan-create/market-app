@@ -18,8 +18,8 @@ app = Flask(__name__)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'your_email@gmail.com'  # <--- PUT YOUR REAL GMAIL HERE
-app.config['MAIL_PASSWORD'] = 'xxxx xxxx xxxx xxxx'   # <--- PUT YOUR 16-CHAR APP PASSWORD HERE
+app.config['MAIL_USERNAME'] = 'alkaabihasan@gmail.com'  # <--- PUT YOUR REAL GMAIL HERE
+app.config['MAIL_PASSWORD'] = 'nlbk hvzs syqj whhf'   # <--- PUT YOUR 16-CHAR APP PASSWORD HERE
 mail = Mail(app)
 # --- CONFIGURATION ---
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
