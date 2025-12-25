@@ -59,6 +59,8 @@ user_favorites = db.Table('user_favorites',
     db.Column('item_id', db.Integer, db.ForeignKey('item.id'), primary_key=True)
 )
 
+
+
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), nullable=False, unique=True)
@@ -67,6 +69,9 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(80), nullable=False)
     reset_token = db.Column(db.String(100), nullable=True)
     token_expiry = db.Column(db.DateTime, nullable=True)
+
+    # RELATIONSHIP: This loads the user's favorite items as a list
+    favorites = db.relationship('Item', secondary=user_favorites, backref='favorited_by', lazy=True)
 
 class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -103,24 +108,28 @@ def load_user(user_id):
 
 # --- FAVORITES ROUTES ---
 
+# --- FAVORITES ROUTES ---
+
 @app.route('/favorite/<int:item_id>')
 @login_required
 def toggle_favorite(item_id):
     item = Item.query.get_or_404(item_id)
+    
+    # Check if already in favorites
     if item in current_user.favorites:
         current_user.favorites.remove(item)
         flash('Removed from wishlist.', 'info')
     else:
         current_user.favorites.append(item)
         flash('Added to wishlist!', 'success')
+        
     db.session.commit()
-    # Redirect back to the page they came from
     return redirect(request.referrer or url_for('home'))
 
 @app.route('/wishlist')
 @login_required
 def wishlist():
-    items = current_user.favorites.all()
+    items = current_user.favorites # Since lazy=True, this is already a list
     return render_template('wishlist.html', items=items)
 
 @app.route('/')
