@@ -1,6 +1,7 @@
 import os
 import re
 import secrets
+from flask_mail import Mail, Message  # <--- NEW IMPORT
 from datetime import datetime, timedelta
 from werkzeug.utils import secure_filename
 import uuid # Needed for unique filenames
@@ -13,7 +14,13 @@ from flask_login import UserMixin, login_user, LoginManager, login_required, log
 from flask_bcrypt import Bcrypt
 
 app = Flask(__name__)
-
+# --- EMAIL CONFIGURATION ---
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'your_email@gmail.com'  # <--- PUT YOUR REAL GMAIL HERE
+app.config['MAIL_PASSWORD'] = 'xxxx xxxx xxxx xxxx'   # <--- PUT YOUR 16-CHAR APP PASSWORD HERE
+mail = Mail(app)
 # --- CONFIGURATION ---
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['SECRET_KEY'] = 'thisisasecretkey' 
@@ -219,17 +226,39 @@ def forgot_password():
     if request.method == 'POST':
         email = request.form['email']
         user = User.query.filter_by(email=email).first()
+        
         if user:
+            # Generate Token
             token = secrets.token_hex(16)
             user.reset_token = token
             user.token_expiry = datetime.now() + timedelta(hours=1)
             db.session.commit()
+            
+            # Create Link
             reset_link = url_for('reset_password', token=token, _external=True)
-            print(f"\n --- EMAIL --- \n Link: {reset_link} \n -------------\n")
-            flash('Reset link sent to console.', 'success')
+            
+            # SEND REAL EMAIL
+            try:
+                msg = Message('Password Reset Request', 
+                              sender='your_email@gmail.com',  # <--- MATCH YOUR CONFIG EMAIL
+                              recipients=[user.email])
+                
+                msg.body = f'''To reset your password, visit the following link:
+{reset_link}
+
+If you did not make this request, simply ignore this email.
+'''
+                mail.send(msg)
+                flash('Email sent! Please check your inbox.', 'success')
+                
+            except Exception as e:
+                print(f"Error sending email: {e}")
+                flash('There was an issue sending the email. Try again later.', 'error')
+                
             return redirect(url_for('login'))
         else:
             flash('Email not found.', 'error')
+            
     return render_template('forgot_password.html')
 
 @app.route('/reset_password/<token>', methods=['GET', 'POST'])
