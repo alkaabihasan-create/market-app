@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" />
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/3081/3081559.png" type="image/png">
     <style>
         /* DEFAULT (Desktop): Hide the bottom mobile menu */
         .mobile-nav { display: none; }
@@ -95,8 +95,14 @@
             </div>
         </div>
 
-        <nav class="nav-links" style="display: flex; gap: 15px; align-items: center;">
+       <nav class="nav-links" style="display: flex; gap: 15px; align-items: center;">
             {% if current_user.is_authenticated %}
+                
+                <a href="/wishlist" style="text-decoration: none; color: #555; display: flex; align-items: center; gap: 5px; font-size: 14px; font-weight: 500;" title="My Wishlist">
+                    <span class="material-symbols-rounded" style="font-size: 20px; color: #e91e63;">favorite</span> 
+                    <span style="display: none; @media (min-width: 900px) { display: inline; }">Wishlist</span>
+                </a>
+
                 <a href="/sell" class="btn-primary" style="
                     background: var(--primary-color); 
                     color: white; 
@@ -112,9 +118,11 @@
                 ">
                     <span class="material-symbols-rounded" style="font-size: 18px;">add</span> Sell
                 </a>
+                
                 <a href="/dashboard" style="text-decoration: none; color: #555; display: flex; align-items: center; gap: 5px; font-size: 14px; font-weight: 500;">
                     <span class="material-symbols-rounded" style="font-size: 20px;">dashboard</span> My Ads
                 </a>
+                
                 <a href="/logout" style="color: #999; text-decoration: none; margin-left: 5px;" title="Logout">
                     <span class="material-symbols-rounded">logout</span>
                 </a>
