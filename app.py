@@ -52,6 +52,13 @@ def is_strong_password(password):
     return True
 
 # --- DATABASE MODELS ---
+
+# ASSOCIATION TABLE FOR FAVORITES
+user_favorites = db.Table('user_favorites',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('item_id', db.Integer, db.ForeignKey('item.id'), primary_key=True)
+)
+
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), nullable=False, unique=True)
@@ -93,6 +100,28 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 # --- ROUTES ---
+
+# --- FAVORITES ROUTES ---
+
+@app.route('/favorite/<int:item_id>')
+@login_required
+def toggle_favorite(item_id):
+    item = Item.query.get_or_404(item_id)
+    if item in current_user.favorites:
+        current_user.favorites.remove(item)
+        flash('Removed from wishlist.', 'info')
+    else:
+        current_user.favorites.append(item)
+        flash('Added to wishlist!', 'success')
+    db.session.commit()
+    # Redirect back to the page they came from
+    return redirect(request.referrer or url_for('home'))
+
+@app.route('/wishlist')
+@login_required
+def wishlist():
+    items = current_user.favorites.all()
+    return render_template('wishlist.html', items=items)
 
 @app.route('/')
 def home():
